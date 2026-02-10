@@ -21,7 +21,7 @@ const COLORS = [
 
 export default function Palette({ selectedColor, onSelectColor }: PaletteProps) {
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft h-full justify-center overflow-y-auto no-scrollbar items-center">
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft h-full justify-start overflow-y-auto no-scrollbar items-center">
       {COLORS.map((color) => (
         <button
           key={color}
