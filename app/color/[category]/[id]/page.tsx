@@ -11,17 +11,17 @@ import { ArrowLeft } from 'lucide-react';
 export default function ColorPage({ params }: { params: Promise<{ category: string; id: string }> }) {
   const router = useRouter();
   const resolvedParams = use(params);
-  
+
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
   const [currentTool, setCurrentTool] = useState<ToolType>('brush');
-  
+
   const shape = SHAPES.find(s => s.id === resolvedParams.id && s.categoryId === resolvedParams.category);
 
   if (!shape) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold mb-4">Shape not found</h1>
-        <button 
+        <button
           onClick={() => router.back()}
           className="px-6 py-2 bg-blue-500 text-white rounded-full"
         >
@@ -35,17 +35,17 @@ export default function ColorPage({ params }: { params: Promise<{ category: stri
     <main className="flex flex-col h-screen w-full bg-[#fdfbf7] overflow-hidden">
       {/* Top Bar */}
       <div className="flex-none h-16 px-4 flex items-center justify-between">
-        <button 
+        <button
           onClick={() => router.back()}
           className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-soft hover:scale-105 transition-transform"
         >
           <ArrowLeft size={24} className="text-gray-600" />
         </button>
-        
+
         <h1 className="text-xl font-bold text-gray-500 uppercase tracking-widest">
           {shape.name}
         </h1>
-        
+
         <div className="w-12" /> {/* Spacer for balance */}
       </div>
 
@@ -71,7 +71,7 @@ export default function ColorPage({ params }: { params: Promise<{ category: stri
         </div>
 
         {/* Right: Palette */}
-        <div className="flex-none w-24 flex flex-col justify-center">
+        <div className="flex-none w-32 flex flex-col justify-center">
           <Palette
             selectedColor={selectedColor}
             onSelectColor={(c) => {

@@ -21,14 +21,14 @@ const COLORS = [
 
 export default function Palette({ selectedColor, onSelectColor }: PaletteProps) {
   return (
-    <div className="flex flex-col gap-3 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft h-full justify-center overflow-y-auto no-scrollbar">
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft h-full justify-center overflow-y-auto no-scrollbar items-center">
       {COLORS.map((color) => (
         <button
           key={color}
           onClick={() => onSelectColor(color)}
           className={`
-            w-12 h-12 rounded-full border-4 transition-all duration-200 shadow-sm
-            ${selectedColor === color ? 'border-gray-800 scale-110' : 'border-white scale-100 hover:scale-105'}
+            w-16 h-16 rounded-full border-4 transition-all duration-200 shadow-sm flex-shrink-0
+            ${selectedColor === color ? 'border-gray-800 scale-110 shadow-md ring-4 ring-white/50' : 'border-white scale-100 hover:scale-105'}
           `}
           style={{ backgroundColor: color }}
           aria-label={`Select color ${color}`}
