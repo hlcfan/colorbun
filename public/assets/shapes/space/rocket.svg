@@ -1,0 +1,20 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rocket Body -->
+  <path 
+    d="M250 50 C200 150 150 250 150 350 L200 400 L300 400 L350 350 C350 250 300 150 250 50 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Window -->
+  <circle cx="250" cy="200" r="40" fill="none" stroke="black" stroke-width="15" />
+  <circle cx="250" cy="200" r="30" fill="none" stroke="black" stroke-width="5" />
+  
+  <!-- Fins -->
+  <path d="M150 350 L100 450 L200 400" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round" />
+  <path d="M350 350 L400 450 L300 400" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round" />
+  
+  <!-- Flame -->
+  <path d="M220 400 Q250 500 280 400" fill="none" stroke="black" stroke-width="10" stroke-linejoin="round" />
+</svg>

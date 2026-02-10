@@ -13,34 +13,62 @@ interface CanvasBoardProps {
 
 export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const paintCanvasRef = useRef<HTMLCanvasElement>(null);
+  const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPoint = useRef<Point | null>(null);
 
-  // Initialize canvas size
+  // Initialize canvas size and load outline
   useEffect(() => {
     const updateSize = () => {
-      if (containerRef.current && canvasRef.current) {
+      if (containerRef.current && paintCanvasRef.current && outlineCanvasRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        // Set actual canvas size to match display size for 1:1 pixel mapping
-        // For retina, we might want to scale up, but let's keep it simple for now
-        canvasRef.current.width = width;
-        canvasRef.current.height = height;
+        
+        // Update both canvases
+        [paintCanvasRef.current, outlineCanvasRef.current].forEach(canvas => {
+          canvas.width = width;
+          canvas.height = height;
+        });
+
+        // Redraw outline after resize
+        drawOutline();
       }
+    };
+
+    const drawOutline = () => {
+      const canvas = outlineCanvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const img = new Image();
+      img.src = outlineSrc;
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw image scaled to fit, centered
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.9;
+        const x = (canvas.width - img.width * scale) / 2;
+        const y = (canvas.height - img.height * scale) / 2;
+        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      };
     };
 
     updateSize();
     window.addEventListener('resize', updateSize);
+    
+    // Also redraw outline when src changes
+    drawOutline();
+
     return () => window.removeEventListener('resize', updateSize);
-  }, []);
+  }, [outlineSrc]);
 
   const getPoint = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent): Point => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
-
-    const rect = canvasRef.current.getBoundingClientRect();
+    if (!paintCanvasRef.current) return { x: 0, y: 0 };
+    
+    const rect = paintCanvasRef.current.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-
+    
     return {
       x: clientX - rect.left,
       y: clientY - rect.top
@@ -49,26 +77,40 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent scrolling
-    if (!canvasRef.current) return;
+    if (!paintCanvasRef.current) return;
 
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = paintCanvasRef.current.getContext('2d');
     if (!ctx) return;
 
     const point = getPoint(e);
 
     if (tool === 'fill') {
-      floodFill(ctx, point.x, point.y, color);
-      audio.play('fill');
+      // Pass the outline canvas context to flood fill for boundary detection
+      const outlineCtx = outlineCanvasRef.current?.getContext('2d');
+      if (outlineCtx) {
+        floodFill(ctx, point.x, point.y, color, outlineCtx);
+        audio.play('fill');
+      }
     } else {
       setIsDrawing(true);
       lastPoint.current = point;
-
+      
       // Draw a dot for immediate feedback
-      ctx.fillStyle = tool === 'eraser' ? '#ffffff' : color;
+      // Eraser uses 'destination-out' to clear paint
+      if (tool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      ctx.fillStyle = tool === 'eraser' ? '#000000' : color; // Color doesn't matter for eraser
       ctx.beginPath();
       ctx.arc(point.x, point.y, tool === 'eraser' ? 20 : 10, 0, Math.PI * 2);
       ctx.fill();
-
+      
+      // Reset composite op
+      ctx.globalCompositeOperation = 'source-over';
+      
       // Play brush sound (throttled in a real app, but here just on start)
       audio.play('brush');
     }
@@ -76,17 +118,25 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    if (!isDrawing || !canvasRef.current || !lastPoint.current) return;
+    if (!isDrawing || !paintCanvasRef.current || !lastPoint.current) return;
 
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = paintCanvasRef.current.getContext('2d');
     if (!ctx) return;
 
     const currentPoint = getPoint(e);
-    const drawColor = tool === 'eraser' ? '#ffffff' : color;
+    const drawColor = tool === 'eraser' ? '#000000' : color;
     const lineWidth = tool === 'eraser' ? 40 : 20;
+
+    if (tool === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+    }
 
     drawLine(ctx, lastPoint.current, currentPoint, drawColor, lineWidth);
     lastPoint.current = currentPoint;
+    
+    ctx.globalCompositeOperation = 'source-over';
   };
 
   const stopDrawing = () => {
@@ -96,10 +146,19 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-white rounded-3xl shadow-inner overflow-hidden touch-none">
-      {/* Painting Layer */}
+      {/* Paint Layer (Bottom) */}
       <canvas
-        ref={canvasRef}
+        ref={paintCanvasRef}
         className="absolute inset-0 z-10"
+      />
+      
+      {/* Outline Layer (Top) - Pointer events pass through to Paint Layer? 
+          Actually, we need events on the TOP element to capture them.
+          So we put event listeners here, but operate on paintCanvasRef.
+      */}
+      <canvas
+        ref={outlineCanvasRef}
+        className="absolute inset-0 z-20"
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
@@ -107,18 +166,6 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
         onTouchStart={startDrawing}
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
-      />
-
-      {/* Outline Layer (SVG overlay) */}
-      {/* Pointer events none so clicks pass through to canvas */}
-      <div
-        className="absolute inset-0 z-20 pointer-events-none"
-        style={{
-          backgroundImage: `url(${outlineSrc})`,
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
       />
     </div>
   );

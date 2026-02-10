@@ -1,0 +1,23 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dog Head -->
+  <path 
+    d="M150 150 L120 200 L120 300 C120 350 150 400 250 400 C350 400 380 350 380 300 L380 200 L350 150 C320 120 180 120 150 150 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Ears -->
+  <path d="M120 200 L50 250 L120 300" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M380 200 L450 250 L380 300" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Eyes -->
+  <circle cx="190" cy="240" r="15" fill="black" />
+  <circle cx="310" cy="240" r="15" fill="black" />
+  
+  <!-- Nose -->
+  <ellipse cx="250" cy="300" rx="25" ry="15" fill="black" />
+  
+  <!-- Mouth -->
+  <path d="M250 315 L250 340 M200 340 Q250 380 300 340" fill="none" stroke="black" stroke-width="8" stroke-linecap="round" />
+</svg>

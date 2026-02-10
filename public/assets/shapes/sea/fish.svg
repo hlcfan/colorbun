@@ -1,0 +1,19 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fish Body -->
+  <path 
+    d="M400 250 Q300 100 150 150 Q50 200 50 250 Q50 300 150 350 Q300 400 400 250 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Tail -->
+  <path d="M400 250 L480 200 L480 300 Z" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round" />
+  <!-- Eye -->
+  <circle cx="120" cy="220" r="15" fill="black" />
+  <!-- Smile -->
+  <path d="M120 280 Q150 300 180 280" fill="none" stroke="black" stroke-width="8" stroke-linecap="round" />
+  <!-- Fins -->
+  <path d="M250 150 L280 100 L320 140" fill="none" stroke="black" stroke-width="12" stroke-linejoin="round" />
+  <path d="M250 350 L280 400 L320 360" fill="none" stroke="black" stroke-width="12" stroke-linejoin="round" />
+</svg>

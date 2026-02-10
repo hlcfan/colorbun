@@ -1,0 +1,23 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Car Body -->
+  <path 
+    d="M50 300 L100 200 L350 200 L450 300 L450 380 L50 380 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Roof/Windows -->
+  <path 
+    d="M120 200 L150 120 L320 120 L350 200" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Wheels -->
+  <circle cx="120" cy="380" r="40" fill="none" stroke="black" stroke-width="15" />
+  <circle cx="380" cy="380" r="40" fill="none" stroke="black" stroke-width="15" />
+  <circle cx="120" cy="380" r="15" fill="black" />
+  <circle cx="380" cy="380" r="15" fill="black" />
+</svg>

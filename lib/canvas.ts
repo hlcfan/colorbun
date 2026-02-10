@@ -22,22 +22,27 @@ export function drawLine(
 }
 
 // Simple flood fill implementation
-// Note: This is a basic recursive/stack-based approach. 
-// For production with large canvases, a typed array stack is better for performance.
 export function floodFill(
   ctx: CanvasRenderingContext2D,
   startX: number,
   startY: number,
-  fillColor: string
+  fillColor: string,
+  outlineCtx?: CanvasRenderingContext2D
 ) {
   const canvas = ctx.canvas;
   const width = canvas.width;
   const height = canvas.height;
-  
+
   // Get image data
   const imageData = ctx.getImageData(0, 0, width, height);
   const data = imageData.data;
-  
+
+  // Get outline data if provided
+  let outlineData: Uint8ClampedArray | null = null;
+  if (outlineCtx) {
+    outlineData = outlineCtx.getImageData(0, 0, width, height).data;
+  }
+
   // Parse fill color
   const tempCtx = document.createElement('canvas').getContext('2d');
   if (!tempCtx) return;
@@ -48,7 +53,7 @@ export function floodFill(
 
   const stack = [[Math.floor(startX), Math.floor(startY)]];
   const startPos = (Math.floor(startY) * width + Math.floor(startX)) * 4;
-  
+
   const startR = data[startPos];
   const startG = data[startPos + 1];
   const startB = data[startPos + 2];
@@ -58,6 +63,13 @@ export function floodFill(
   if (startR === r && startG === g && startB === b && startA === a) return;
 
   function matchStartColor(pos: number) {
+    // Check outline boundary first
+    if (outlineData) {
+      // If alpha > 50, consider it a line/boundary
+      // Assuming black lines. If colored lines, might need more logic.
+      if (outlineData[pos + 3] > 50) return false;
+    }
+
     return (
       data[pos] === startR &&
       data[pos + 1] === startG &&
@@ -82,13 +94,13 @@ export function floodFill(
       y1--;
       pixelPos -= width * 4;
     }
-    
+
     pixelPos += width * 4;
     y1++;
-    
+
     let reachLeft = false;
     let reachRight = false;
-    
+
     while (y1 < height && matchStartColor(pixelPos)) {
       colorPixel(pixelPos);
 

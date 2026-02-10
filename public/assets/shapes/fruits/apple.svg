@@ -1,0 +1,16 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Apple Body -->
+  <path 
+    d="M250 150 C200 100 100 150 100 250 C100 380 200 450 250 420 C300 450 400 380 400 250 C400 150 300 100 250 150 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Stem -->
+  <path d="M250 150 Q250 100 280 80" fill="none" stroke="black" stroke-width="15" stroke-linecap="round" />
+  <!-- Leaf -->
+  <path d="M250 150 Q200 100 220 80 Q260 80 250 150" fill="none" stroke="black" stroke-width="10" stroke-linejoin="round" />
+  <!-- Shine -->
+  <path d="M320 200 Q350 220 340 250" fill="none" stroke="black" stroke-width="8" stroke-linecap="round" opacity="0.5" />
+</svg>

@@ -1,0 +1,30 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- T-Rex Body -->
+  <path 
+    d="M150 100 C150 50 250 50 280 100 L300 150 L350 200 L400 350 L350 450 L250 450 L200 350 L100 300 L50 200 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  <!-- Head detail adjustment -->
+  <path d="M150 100 L100 120 L120 180" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round" />
+  
+  <!-- Tail (implied in body loop or separate?) Let's make a clearer simple shape -->
+  <!-- Redrawing simpler T-rex -->
+  <path 
+    d="M100 150 Q100 50 200 50 Q300 50 350 150 L400 180 L350 220 L350 350 L400 450 L300 450 L250 350 L200 350 L150 450 L50 450 L100 350 L50 250 Z" 
+    fill="none" 
+    stroke="black" 
+    stroke-width="15" 
+    stroke-linejoin="round"
+  />
+  
+  <!-- Eye -->
+  <circle cx="180" cy="120" r="10" fill="black" />
+  <!-- Teeth -->
+  <path d="M100 180 L120 180 M100 190 L120 190" fill="none" stroke="black" stroke-width="5" />
+  
+  <!-- Tiny Arms -->
+  <path d="M250 220 L300 240 L280 260" fill="none" stroke="black" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
