@@ -1,6 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  --color-background: #fdfbf7;
+  --color-foreground: #4a4a4a;
+}
 
 :root {
   --background: #fdfbf7; /* Warm white */
