@@ -1,0 +1,23 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <ellipse cx="250" cy="250" rx="120" ry="80" fill="none" stroke="black" stroke-width="15"/>
+  
+  <!-- Eyes -->
+  <line x1="200" y1="180" x2="200" y2="140" stroke="black" stroke-width="10"/>
+  <circle cx="200" cy="140" r="15" fill="black"/>
+  <line x1="300" y1="180" x2="300" y2="140" stroke="black" stroke-width="10"/>
+  <circle cx="300" cy="140" r="15" fill="black"/>
+  
+  <!-- Claws -->
+  <path d="M140 220 Q80 150 50 180 Q80 250 140 220" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M360 220 Q420 150 450 180 Q420 250 360 220" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Legs -->
+  <path d="M150 280 L100 320" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M160 300 L120 350" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M350 280 L400 320" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M340 300 L380 350" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- Smile -->
+  <path d="M220 280 Q250 300 280 280" fill="none" stroke="black" stroke-width="8" stroke-linecap="round"/>
+</svg>

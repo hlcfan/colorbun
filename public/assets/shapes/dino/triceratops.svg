@@ -1,0 +1,15 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <path d="M100 250 Q200 150 350 200 L400 300 L350 400 L250 400 L250 350 L150 350 L150 400 L50 400 L50 300 Z" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Frill -->
+  <path d="M350 200 Q400 100 450 150 L400 300" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Horns -->
+  <path d="M400 200 L450 180" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M410 230 L460 230" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M350 250 L380 230" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  
+  <!-- Eye -->
+  <circle cx="380" cy="250" r="8" fill="black"/>
+</svg>

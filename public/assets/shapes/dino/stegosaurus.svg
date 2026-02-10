@@ -1,0 +1,17 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <path d="M100 300 Q150 200 300 200 Q400 200 450 300 L400 400 L350 400 L350 350 L250 350 L250 400 L150 400 L100 350 Z" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Plates -->
+  <path d="M150 210 L180 150 L210 210" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M220 200 L250 130 L280 200" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M300 200 L330 140 L360 210" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Head -->
+  <path d="M100 300 Q50 320 60 350 L100 350" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <circle cx="80" cy="320" r="5" fill="black"/>
+  
+  <!-- Tail Spikes -->
+  <path d="M450 300 L480 280" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+  <path d="M450 310 L490 310" fill="none" stroke="black" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Head -->
+  <circle cx="250" cy="300" r="100" fill="none" stroke="black" stroke-width="15"/>
+  
+  <!-- Ears -->
+  <path d="M180 230 C150 100 200 50 220 150" fill="none" stroke="black" stroke-width="15" stroke-linecap="round"/>
+  <path d="M320 230 C350 100 300 50 280 150" fill="none" stroke="black" stroke-width="15" stroke-linecap="round"/>
+  
+  <!-- Face -->
+  <circle cx="220" cy="280" r="10" fill="black"/>
+  <circle cx="280" cy="280" r="10" fill="black"/>
+  <path d="M250 320 L230 350 L270 350 Z" fill="black"/>
+  
+  <!-- Whiskers -->
+  <path d="M150 300 L200 310" fill="none" stroke="black" stroke-width="8"/>
+  <path d="M350 300 L300 310" fill="none" stroke="black" stroke-width="8"/>
+</svg>

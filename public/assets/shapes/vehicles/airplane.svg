@@ -1,0 +1,15 @@
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Body -->
+  <path d="M100 250 Q100 150 400 250 Q100 350 100 250 Z" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Wings -->
+  <path d="M250 200 L300 100 L350 215" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  <path d="M250 300 L300 400 L350 285" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Tail -->
+  <path d="M100 250 L50 200 L50 300 Z" fill="none" stroke="black" stroke-width="15" stroke-linejoin="round"/>
+  
+  <!-- Windows -->
+  <circle cx="280" cy="250" r="10" fill="black"/>
+  <circle cx="320" cy="250" r="10" fill="black"/>
+</svg>
