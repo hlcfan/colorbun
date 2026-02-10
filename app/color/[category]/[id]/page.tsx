@@ -14,7 +14,9 @@ export default function ColorPage({ params }: { params: Promise<{ category: stri
 
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
   const [currentTool, setCurrentTool] = useState<ToolType>('brush');
-
+  const [canUndo, setCanUndo] = useState(false);
+  const [undoTrigger, setUndoTrigger] = useState(0);
+  
   const shape = SHAPES.find(s => s.id === resolvedParams.id && s.categoryId === resolvedParams.category);
 
   if (!shape) {
@@ -56,8 +58,9 @@ export default function ColorPage({ params }: { params: Promise<{ category: stri
           <Toolbar
             currentTool={currentTool}
             onSelectTool={setCurrentTool}
-            onUndo={() => {}} // TODO: Implement Undo
+            onUndo={() => setUndoTrigger(prev => prev + 1)}
             onExport={() => {}} // TODO: Implement Export
+            canUndo={canUndo}
           />
         </div>
 
@@ -67,6 +70,8 @@ export default function ColorPage({ params }: { params: Promise<{ category: stri
             tool={currentTool}
             color={selectedColor}
             outlineSrc={shape.src}
+            onHistoryChange={setCanUndo}
+            undoTrigger={undoTrigger}
           />
         </div>
 

@@ -9,21 +9,62 @@ interface CanvasBoardProps {
   tool: ToolType;
   color: string;
   outlineSrc: string; // URL to the SVG outline
+  onHistoryChange?: (canUndo: boolean) => void;
+  undoTrigger?: number; // Increment this to trigger undo
 }
 
-export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProps) {
+export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, undoTrigger }: CanvasBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPoint = useRef<Point | null>(null);
 
+  // History management
+  const historyRef = useRef<ImageData[]>([]);
+  const MAX_HISTORY = 20;
+
+  const saveToHistory = () => {
+    if (!paintCanvasRef.current) return;
+    const ctx = paintCanvasRef.current.getContext('2d');
+    if (!ctx) return;
+
+    const { width, height } = paintCanvasRef.current;
+    // Save current state
+    const imageData = ctx.getImageData(0, 0, width, height);
+
+    historyRef.current.push(imageData);
+    if (historyRef.current.length > MAX_HISTORY) {
+      historyRef.current.shift();
+    }
+
+    // Notify parent about history state
+    onHistoryChange?.(historyRef.current.length > 0);
+  };
+
+  // Handle undo trigger
+  useEffect(() => {
+    if (undoTrigger && undoTrigger > 0) {
+      if (historyRef.current.length === 0) return;
+
+      const previousState = historyRef.current.pop();
+      if (previousState && paintCanvasRef.current) {
+        const ctx = paintCanvasRef.current.getContext('2d');
+        if (ctx) {
+          ctx.putImageData(previousState, 0, 0);
+        }
+      }
+
+      onHistoryChange?.(historyRef.current.length > 0);
+    }
+  }, [undoTrigger]);
+
   // Initialize canvas size and load outline
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current && paintCanvasRef.current && outlineCanvasRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        
+
         // Update both canvases
         [paintCanvasRef.current, outlineCanvasRef.current].forEach(canvas => {
           canvas.width = width;
@@ -55,7 +96,7 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
     updateSize();
     window.addEventListener('resize', updateSize);
-    
+
     // Also redraw outline when src changes
     drawOutline();
 
@@ -64,11 +105,11 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
   const getPoint = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent): Point => {
     if (!paintCanvasRef.current) return { x: 0, y: 0 };
-    
+
     const rect = paintCanvasRef.current.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    
+
     return {
       x: clientX - rect.left,
       y: clientY - rect.top
@@ -85,6 +126,9 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
     const point = getPoint(e);
 
     if (tool === 'fill') {
+      // Save state before filling
+      saveToHistory();
+
       // Pass the outline canvas context to flood fill for boundary detection
       const outlineCtx = outlineCanvasRef.current?.getContext('2d');
       if (outlineCtx) {
@@ -93,8 +137,11 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
       }
     } else {
       setIsDrawing(true);
+      // Save state before starting new stroke
+      saveToHistory();
+
       lastPoint.current = point;
-      
+
       // Draw a dot for immediate feedback
       // Eraser uses 'destination-out' to clear paint
       if (tool === 'eraser') {
@@ -107,10 +154,10 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
       ctx.beginPath();
       ctx.arc(point.x, point.y, tool === 'eraser' ? 20 : 10, 0, Math.PI * 2);
       ctx.fill();
-      
+
       // Reset composite op
       ctx.globalCompositeOperation = 'source-over';
-      
+
       // Play brush sound (throttled in a real app, but here just on start)
       audio.play('brush');
     }
@@ -135,7 +182,7 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
 
     drawLine(ctx, lastPoint.current, currentPoint, drawColor, lineWidth);
     lastPoint.current = currentPoint;
-    
+
     ctx.globalCompositeOperation = 'source-over';
   };
 
@@ -151,8 +198,8 @@ export default function CanvasBoard({ tool, color, outlineSrc }: CanvasBoardProp
         ref={paintCanvasRef}
         className="absolute inset-0 z-10"
       />
-      
-      {/* Outline Layer (Top) - Pointer events pass through to Paint Layer? 
+
+      {/* Outline Layer (Top) - Pointer events pass through to Paint Layer?
           Actually, we need events on the TOP element to capture them.
           So we put event listeners here, but operate on paintCanvasRef.
       */}
