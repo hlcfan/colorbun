@@ -1,6 +1,6 @@
 "use client";
 
-import { Paintbrush, PaintBucket, Eraser, RotateCcw, Download } from "lucide-react";
+import { Paintbrush, PaintBucket, Eraser, Undo2, Download } from "lucide-react";
 import { audio } from "@/lib/audio";
 
 export type ToolType = 'brush' | 'fill' | 'eraser';
@@ -10,9 +10,10 @@ interface ToolbarProps {
   onSelectTool: (tool: ToolType) => void;
   onUndo: () => void;
   onExport: () => void;
+  canUndo?: boolean;
 }
 
-export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport }: ToolbarProps) {
+export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport, canUndo = false }: ToolbarProps) {
   const handleToolClick = (tool: ToolType) => {
     audio.play('tap');
     onSelectTool(tool);
@@ -46,17 +47,18 @@ export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport }:
         label="Eraser"
         color="text-pink-500"
       />
-
+      
       <div className="h-px bg-gray-200 my-2" />
-
+      
       <ToolButton
         isActive={false}
         onClick={() => handleActionClick(onUndo)}
-        icon={RotateCcw}
+        icon={Undo2}
         label="Undo"
         color="text-gray-600"
+        disabled={!canUndo}
       />
-
+      
       <ToolButton
         isActive={false}
         onClick={() => handleActionClick(onExport)}
@@ -68,17 +70,19 @@ export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport }:
   );
 }
 
-function ToolButton({ isActive, onClick, icon: Icon, label, color }: any) {
+function ToolButton({ isActive, onClick, icon: Icon, label, color, disabled }: any) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`
         flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all duration-200
-        ${isActive ? 'bg-blue-50 shadow-inner scale-95 ring-2 ring-blue-200' : 'bg-white shadow-sm hover:bg-gray-50 scale-100'}
+        ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}
+        ${isActive ? 'bg-blue-50 shadow-inner scale-95 ring-2 ring-blue-200' : disabled ? '' : 'bg-white shadow-sm hover:bg-gray-50 scale-100'}
       `}
       title={label}
     >
-      <Icon size={28} className={isActive ? color : 'text-gray-400'} />
+      <Icon size={28} className={isActive ? color : disabled ? 'text-gray-300' : 'text-gray-400'} />
       {/* <span className="text-[10px] font-bold mt-1 text-gray-500">{label}</span> */}
     </button>
   );
