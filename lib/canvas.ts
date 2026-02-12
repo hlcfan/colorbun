@@ -65,9 +65,20 @@ export function floodFill(
   function matchStartColor(pos: number) {
     // Check outline boundary first
     if (outlineData) {
-      // If alpha > 50, consider it a line/boundary
-      // Assuming black lines. If colored lines, might need more logic.
-      if (outlineData[pos + 3] > 50) return false;
+      const oR = outlineData[pos];
+      const oG = outlineData[pos + 1];
+      const oB = outlineData[pos + 2];
+      const oA = outlineData[pos + 3];
+
+      // If it's a significant pixel (not transparent)
+      if (oA > 50) {
+        // If it's NOT white (or close to white), it's a boundary
+        // We assume the background is white (255,255,255) and lines are dark
+        // So if any channel is < 200, it's likely a line
+        if (oR < 200 || oG < 200 || oB < 200) {
+          return false;
+        }
+      }
     }
 
     return (

@@ -205,7 +205,7 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
       */}
       <canvas
         ref={outlineCanvasRef}
-        className="absolute inset-0 z-20"
+        className="absolute inset-0 z-20 mix-blend-multiply pointer-events-auto"
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}

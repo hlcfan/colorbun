@@ -28,35 +28,35 @@ export const CATEGORIES: Category[] = [
 // but hardcoding the registry is safer for static export.
 export const SHAPES: Shape[] = [
   // Animals
-  { id: 'cat', categoryId: 'animals', name: 'Cat', src: '/assets/shapes/animals/cat.svg' },
-  { id: 'dog', categoryId: 'animals', name: 'Dog', src: '/assets/shapes/animals/dog.svg' },
-  { id: 'elephant', categoryId: 'animals', name: 'Elephant', src: '/assets/shapes/animals/elephant.svg' },
-  { id: 'rabbit', categoryId: 'animals', name: 'Rabbit', src: '/assets/shapes/animals/rabbit.svg' },
+  { id: 'cat', categoryId: 'animals', name: 'Cat', src: '/assets/shapes/animals/cat.png' },
+  { id: 'dog', categoryId: 'animals', name: 'Dog', src: '/assets/shapes/animals/dog.png' },
+  { id: 'elephant', categoryId: 'animals', name: 'Elephant', src: '/assets/shapes/animals/elephant.png' },
+  { id: 'rabbit', categoryId: 'animals', name: 'Rabbit', src: '/assets/shapes/animals/bunny.png' },
 
   // Vehicles
-  { id: 'car', categoryId: 'vehicles', name: 'Car', src: '/assets/shapes/vehicles/car.svg' },
-  { id: 'bus', categoryId: 'vehicles', name: 'Bus', src: '/assets/shapes/vehicles/bus.svg' },
-  { id: 'airplane', categoryId: 'vehicles', name: 'Airplane', src: '/assets/shapes/vehicles/airplane.svg' },
+  { id: 'car', categoryId: 'vehicles', name: 'Car', src: '/assets/shapes/vehicles/car.png' },
+  { id: 'bus', categoryId: 'vehicles', name: 'Bus', src: '/assets/shapes/vehicles/bus.png' },
+  { id: 'airplane', categoryId: 'vehicles', name: 'Airplane', src: '/assets/shapes/vehicles/airplane.png' },
 
   // Fruits
-  { id: 'apple', categoryId: 'fruits', name: 'Apple', src: '/assets/shapes/fruits/apple.svg' },
-  { id: 'banana', categoryId: 'fruits', name: 'Banana', src: '/assets/shapes/fruits/banana.svg' },
-  { id: 'strawberry', categoryId: 'fruits', name: 'Strawberry', src: '/assets/shapes/fruits/strawberry.svg' },
+  { id: 'apple', categoryId: 'fruits', name: 'Apple', src: '/assets/shapes/fruits/apple.png' },
+  { id: 'banana', categoryId: 'fruits', name: 'Banana', src: '/assets/shapes/fruits/banana.png' },
+  { id: 'strawberry', categoryId: 'fruits', name: 'Strawberry', src: '/assets/shapes/fruits/strawberry.png' },
 
   // Sea
-  { id: 'fish', categoryId: 'sea', name: 'Fish', src: '/assets/shapes/sea/fish.svg' },
-  { id: 'octopus', categoryId: 'sea', name: 'Octopus', src: '/assets/shapes/sea/octopus.svg' },
-  { id: 'crab', categoryId: 'sea', name: 'Crab', src: '/assets/shapes/sea/crab.svg' },
+  { id: 'fish', categoryId: 'sea', name: 'Fish', src: '/assets/shapes/sea/fish.png' },
+  { id: 'octopus', categoryId: 'sea', name: 'Octopus', src: '/assets/shapes/sea/octopus.png' },
+  { id: 'crab', categoryId: 'sea', name: 'Crab', src: '/assets/shapes/sea/crab.png' },
 
   // Dino
-  { id: 't-rex', categoryId: 'dino', name: 'T-Rex', src: '/assets/shapes/dino/t-rex.svg' },
-  { id: 'stegosaurus', categoryId: 'dino', name: 'Stegosaurus', src: '/assets/shapes/dino/stegosaurus.svg' },
-  { id: 'triceratops', categoryId: 'dino', name: 'Triceratops', src: '/assets/shapes/dino/triceratops.svg' },
+  { id: 't-rex', categoryId: 'dino', name: 'T-Rex', src: '/assets/shapes/dino/t-rex.png' },
+  { id: 'stegosaurus', categoryId: 'dino', name: 'Stegosaurus', src: '/assets/shapes/dino/stegosaurus.png' },
+  { id: 'triceratops', categoryId: 'dino', name: 'Triceratops', src: '/assets/shapes/dino/triceratops.png' },
 
   // Space
-  { id: 'rocket', categoryId: 'space', name: 'Rocket', src: '/assets/shapes/space/rocket.svg' },
-  { id: 'planet', categoryId: 'space', name: 'Planet', src: '/assets/shapes/space/planet.svg' },
-  { id: 'star', categoryId: 'space', name: 'Star', src: '/assets/shapes/space/star.svg' },
+  { id: 'rocket', categoryId: 'space', name: 'Rocket', src: '/assets/shapes/space/rocket.png' },
+  { id: 'planet', categoryId: 'space', name: 'Planet', src: '/assets/shapes/space/planet.png' },
+  { id: 'star', categoryId: 'space', name: 'Star', src: '/assets/shapes/space/star.png' },
 ];
 
 export function getShapesByCategory(categoryId: CategoryId) {
