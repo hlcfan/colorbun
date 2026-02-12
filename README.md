@@ -1,13 +1,15 @@
 # 🐰 ColorBun
 
+[![Deploy with Vercel](https://vercel.com/button)](https://colorbun-amber.vercel.app/)
+
 ColorBun is a touch-first, browser-based coloring game designed for toddlers (aged 3–4). It features a "zero friction" interface with no text, no ads, and no accounts—just pure creative fun.
 
-![ColorBun](public/file.svg)
+👉 **Play Now:** [https://colorbun-amber.vercel.app/](https://colorbun-amber.vercel.app/)
 
 ## ✨ Features
 
 - **Toddler-First UI:** Large buttons, icon-based navigation, and forgiving interactions.
-- **Dual-Mode Coloring:** 
+- **Dual-Mode Coloring:**
   - 🖌️ **Brush:** For freehand drawing.
   - 🪣 **Fill:** Smart flood-fill algorithm that stays within lines.
 - **Works Offline:** Built as a static PWA.
@@ -30,7 +32,7 @@ ColorBun is a touch-first, browser-based coloring game designed for toddlers (ag
 
 ## 🎨 Adding New Coloring Pages
 
-ColorBun supports standard PNG/JPG images. You can use AI tools (like Midjourney or DALL-E) or draw them yourself.
+ColorBun supports standard PNG/JPG images. You can use AI tools or draw them yourself.
 
 ### 1. Image Requirements
 - **Format:** PNG or JPG
@@ -43,11 +45,11 @@ ColorBun supports standard PNG/JPG images. You can use AI tools (like Midjourney
     *   *Example:* `public/assets/shapes/animals/lion.png`
 2.  **Register:** Add the shape to `lib/shapes.ts`:
     ```typescript
-    { 
-      id: 'lion', 
-      categoryId: 'animals', 
-      name: 'Lion', 
-      src: '/assets/shapes/animals/lion.png' 
+    {
+      id: 'lion',
+      categoryId: 'animals',
+      name: 'Lion',
+      src: '/assets/shapes/animals/lion.png'
     }
     ```
 3.  **Done!** It will appear in the app automatically.
