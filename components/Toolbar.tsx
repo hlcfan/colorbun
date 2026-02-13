@@ -5,27 +5,25 @@ import { audio } from "@/lib/audio";
 
 export type ToolType = 'brush' | 'fill' | 'eraser';
 
-interface ToolbarProps {
+interface ToolsProps {
   currentTool: ToolType;
   onSelectTool: (tool: ToolType) => void;
+}
+
+interface ActionsProps {
   onUndo: () => void;
   onExport: () => void;
   canUndo?: boolean;
 }
 
-export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport, canUndo = false }: ToolbarProps) {
+export function Tools({ currentTool, onSelectTool }: ToolsProps) {
   const handleToolClick = (tool: ToolType) => {
     audio.play('tap');
     onSelectTool(tool);
   };
 
-  const handleActionClick = (action: () => void) => {
-    audio.play('tap');
-    action();
-  };
-
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft h-full justify-center">
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft justify-center items-center w-full">
       <ToolButton
         isActive={currentTool === 'brush'}
         onClick={() => handleToolClick('brush')}
@@ -47,9 +45,18 @@ export default function Toolbar({ currentTool, onSelectTool, onUndo, onExport, c
         label="Eraser"
         color="text-pink-500"
       />
-      
-      <div className="h-px bg-gray-200 my-2" />
-      
+    </div>
+  );
+}
+
+export function Actions({ onUndo, onExport, canUndo = false }: ActionsProps) {
+  const handleActionClick = (action: () => void) => {
+    audio.play('tap');
+    action();
+  };
+
+  return (
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft justify-center items-center w-full">
       <ToolButton
         isActive={false}
         onClick={() => handleActionClick(onUndo)}

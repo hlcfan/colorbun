@@ -1,7 +1,5 @@
 # 🐰 ColorBun
 
-[![Deploy with Vercel](https://vercel.com/button)](https://colorbun-amber.vercel.app/)
-
 ColorBun is a touch-first, browser-based coloring game designed for toddlers (aged 3–4). It features a "zero friction" interface with no text, no ads, and no accounts—just pure creative fun.
 
 👉 **Play Now:** [https://colorbun-amber.vercel.app/](https://colorbun-amber.vercel.app/)

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SHAPES } from '@/lib/shapes';
 import Palette from '@/components/Palette';
-import Toolbar, { ToolType } from '@/components/Toolbar';
+import { Tools, Actions, ToolType } from '@/components/Toolbar';
 import CanvasBoard from '@/components/CanvasBoard';
 import { ArrowLeft } from 'lucide-react';
 
@@ -57,18 +57,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
 
       {/* Main Workspace */}
       <div className="flex-1 flex gap-4 p-4 min-h-0">
-        {/* Left: Toolbar */}
-        <div className="flex-none w-24 flex flex-col justify-center">
-          <Toolbar
-            currentTool={currentTool}
-            onSelectTool={setCurrentTool}
-            onUndo={() => setUndoTrigger(prev => prev + 1)}
-            onExport={() => {}} // TODO: Implement Export
-            canUndo={canUndo}
-          />
-        </div>
-
-        {/* Center: Canvas */}
+        {/* Left: Canvas */}
         <div className="flex-1 min-w-0">
           <CanvasBoard
             tool={currentTool}
@@ -79,16 +68,29 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
           />
         </div>
 
-        {/* Right: Palette */}
-        <div className="flex-none w-32 flex flex-col justify-center">
-          <Palette
-            selectedColor={selectedColor}
-            onSelectColor={(c) => {
-              setSelectedColor(c);
-              if (currentTool === 'eraser') {
-                setCurrentTool('brush');
-              }
-            }}
+        {/* Right: Panel (Palette, Tools, Actions) */}
+        <div className="flex-none w-32 flex flex-col gap-4">
+          <div className="flex-1 min-h-0">
+            <Palette
+              selectedColor={selectedColor}
+              onSelectColor={(c) => {
+                setSelectedColor(c);
+                if (currentTool === 'eraser') {
+                  setCurrentTool('brush');
+                }
+              }}
+            />
+          </div>
+          
+          <Tools
+            currentTool={currentTool}
+            onSelectTool={setCurrentTool}
+          />
+          
+          <Actions
+            onUndo={() => setUndoTrigger(prev => prev + 1)}
+            onExport={() => {}} // TODO: Implement Export
+            canUndo={canUndo}
           />
         </div>
       </div>
