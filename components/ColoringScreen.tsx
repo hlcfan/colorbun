@@ -19,7 +19,9 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
   const [currentTool, setCurrentTool] = useState<ToolType>('brush');
   const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
   const [undoTrigger, setUndoTrigger] = useState(0);
+  const [redoTrigger, setRedoTrigger] = useState(0);
   
   const shape = SHAPES.find(s => s.id === shapeId && s.categoryId === categoryId);
 
@@ -63,14 +65,18 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
             tool={currentTool}
             color={selectedColor}
             outlineSrc={shape.src}
-            onHistoryChange={setCanUndo}
+            onHistoryChange={(undo, redo) => {
+              setCanUndo(undo);
+              setCanRedo(redo);
+            }}
             undoTrigger={undoTrigger}
+            redoTrigger={redoTrigger}
           />
         </div>
 
         {/* Right: Panel (Palette, Tools, Actions) */}
-        <div className="flex-none w-32 flex flex-col gap-4">
-          <div className="flex-1 min-h-0">
+        <div className="flex-none w-32 flex flex-col gap-4 items-center justify-center">
+          <div className="flex-none">
             <Palette
               selectedColor={selectedColor}
               onSelectColor={(c) => {
@@ -89,8 +95,10 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
           
           <Actions
             onUndo={() => setUndoTrigger(prev => prev + 1)}
+            onRedo={() => setRedoTrigger(prev => prev + 1)}
             onExport={() => {}} // TODO: Implement Export
             canUndo={canUndo}
+            canRedo={canRedo}
           />
         </div>
       </div>

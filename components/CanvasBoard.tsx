@@ -9,11 +9,12 @@ interface CanvasBoardProps {
   tool: ToolType;
   color: string;
   outlineSrc: string; // URL to the SVG outline
-  onHistoryChange?: (canUndo: boolean) => void;
+  onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
   undoTrigger?: number; // Increment this to trigger undo
+  redoTrigger?: number; // Increment this to trigger redo
 }
 
-export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, undoTrigger }: CanvasBoardProps) {
+export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, undoTrigger, redoTrigger }: CanvasBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,6 +23,7 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
 
   // History management
   const historyRef = useRef<ImageData[]>([]);
+  const redoStackRef = useRef<ImageData[]>([]);
   const MAX_HISTORY = 20;
 
   const saveToHistory = () => {
@@ -37,9 +39,12 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
     if (historyRef.current.length > MAX_HISTORY) {
       historyRef.current.shift();
     }
+    
+    // Clear redo stack when new action is performed
+    redoStackRef.current = [];
 
     // Notify parent about history state
-    onHistoryChange?.(historyRef.current.length > 0);
+    onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
   };
 
   // Handle undo trigger
@@ -47,17 +52,94 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
     if (undoTrigger && undoTrigger > 0) {
       if (historyRef.current.length === 0) return;
 
+      const paintCanvas = paintCanvasRef.current;
+      if (!paintCanvas) return;
+      const ctx = paintCanvas.getContext('2d');
+      if (!ctx) return;
+
+      // Save current state to redo stack before undoing
+      const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
+      redoStackRef.current.push(currentImageData);
+
       const previousState = historyRef.current.pop();
-      if (previousState && paintCanvasRef.current) {
-        const ctx = paintCanvasRef.current.getContext('2d');
-        if (ctx) {
-          ctx.putImageData(previousState, 0, 0);
-        }
+      if (previousState) {
+        ctx.putImageData(previousState, 0, 0);
+      } else {
+        // If history is empty (should not happen due to check above), clear canvas
+        ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
 
-      onHistoryChange?.(historyRef.current.length > 0);
+      onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
     }
   }, [undoTrigger]);
+
+  // Handle redo trigger
+  useEffect(() => {
+    if (redoTrigger && redoTrigger > 0) {
+      if (redoStackRef.current.length === 0) return;
+
+      const paintCanvas = paintCanvasRef.current;
+      if (!paintCanvas) return;
+      const ctx = paintCanvas.getContext('2d');
+      if (!ctx) return;
+
+      // Save current state to undo history before redoing
+      // Actually, standard redo implementation:
+      // pop from redo stack, push CURRENT state to undo stack, apply redo state.
+      // Wait, usually:
+      // Undo: pop history, push current to redo, apply history
+      // Redo: pop redo, push current to history, apply redo
+      
+      // Let's refine the logic.
+      // Ideally history contains PAST states.
+      // Current state is on canvas.
+      
+      // Correct Undo Flow:
+      // 1. Save CURRENT canvas to redo stack
+      // 2. Pop PREVIOUS state from history
+      // 3. Put PREVIOUS state on canvas
+      
+      // Correct Redo Flow:
+      // 1. Save CURRENT canvas to history
+      // 2. Pop NEXT state from redo stack
+      // 3. Put NEXT state on canvas
+      
+      // My implementation of Undo was: 
+      // previousState = history.pop() -> putImageData(previousState)
+      // This assumes history stores the state *before* the current one.
+      // So when I draw, I must saveToHistory() *before* applying changes?
+      // Yes, line 129/140 calls saveToHistory().
+      
+      // So historyRef contains snapshots of canvas BEFORE each operation.
+      // Current canvas shows the result of the latest operation.
+      
+      // UNDO:
+      // 1. We need to save the CURRENT state to redo stack so we can return to it.
+      //    currentImageData = ctx.getImageData(...)
+      //    redoStack.push(currentImageData)
+      // 2. Pop the last state from history.
+      //    previousState = history.pop()
+      // 3. Restore previousState.
+      
+      // REDO:
+      // 1. We need to save the CURRENT state (which is a past state now) to history.
+      //    currentImageData = ctx.getImageData(...)
+      //    history.push(currentImageData)
+      // 2. Pop state from redo stack.
+      //    nextState = redoStack.pop()
+      // 3. Restore nextState.
+      
+      const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
+      historyRef.current.push(currentImageData);
+      
+      const nextState = redoStackRef.current.pop();
+      if (nextState) {
+        ctx.putImageData(nextState, 0, 0);
+      }
+      
+      onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
+    }
+  }, [redoTrigger]);
 
   // Initialize canvas size and load outline
   useEffect(() => {
