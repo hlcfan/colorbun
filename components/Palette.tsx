@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Palette as PaletteIcon } from 'lucide-react';
 import { audio } from '@/lib/audio';
+import { Button } from './Button';
 
 interface PaletteProps {
   selectedColor: string;
@@ -52,36 +53,36 @@ export default function Palette({ selectedColor, onSelectColor }: PaletteProps) 
 
   return (
     <div className="relative w-full flex justify-center" ref={containerRef}>
-      <button
+      <Button
+        variant="icon"
+        size="icon"
         onClick={handleToggle}
-        className={`
-          w-16 h-16 rounded-xl shadow-soft flex items-center justify-center transition-all duration-200 active:scale-95 border-4
-          ${isOpen ? 'ring-4 ring-blue-100 scale-105 border-white' : 'border-white hover:scale-105'}
-        `}
+        className="overflow-hidden"
         style={{ backgroundColor: selectedColor }}
-        aria-label="Open color palette"
+        title="Open color palette"
       >
-        <PaletteIcon 
+         <PaletteIcon 
           className={`drop-shadow-md ${selectedColor === '#ffffff' ? 'text-gray-400' : 'text-white'}`} 
-          size={32} 
+          size={32}
+          strokeWidth={2.5}
         />
-      </button>
+      </Button>
 
       {isOpen && (
-        <div className="absolute right-full top-0 mr-4 p-4 bg-white/95 backdrop-blur rounded-2xl shadow-xl grid grid-cols-3 gap-3 w-64 z-50 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] grid grid-cols-3 gap-3 w-64 z-50 animate-in fade-in zoom-in-95 duration-200">
            {COLORS.map((color) => (
              <button
                key={color}
                onClick={() => handleSelect(color)}
                className={`
-                 w-12 h-12 rounded-full border-2 transition-all duration-200 shadow-sm
-                 ${selectedColor === color ? 'border-gray-800 scale-110 ring-2 ring-gray-200' : 'border-white hover:scale-110 hover:shadow-md'}
+                 w-12 h-12 rounded-full border-[3px] transition-all duration-150 shadow-[0_3px_0_rgba(0,0,0,0.2)]
+                 active:translate-y-[3px] active:shadow-none
+                 ${selectedColor === color ? 'border-gray-800 scale-110 ring-2 ring-gray-200' : 'border-white hover:scale-110'}
                `}
                style={{ backgroundColor: color }}
                aria-label={`Select color ${color}`}
              />
            ))}
-           {/* Add a generic "close" hint or area if needed, but click outside works */}
         </div>
       )}
     </div>

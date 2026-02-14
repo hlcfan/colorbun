@@ -6,21 +6,30 @@
 @theme {
   --color-background: #fdfbf7;
   --color-foreground: #4a4a4a;
+  --font-sans: var(--font-fredoka), system-ui, sans-serif;
 }
 
 :root {
-  --background: #fdfbf7; /* Warm white */
+  --background: #fffdf5; /* Warmer pastel background */
   --foreground: #4a4a4a; /* Soft black */
+  
+  /* Cartoon Palette */
+  --btn-border: #2d3748; /* Dark border for everything */
+  --shadow-color: rgba(0, 0, 0, 0.15);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font-fredoka), system-ui, -apple-system, sans-serif;
   overflow: hidden; /* Prevent scrolling for app-like feel */
   touch-action: none; /* Prevent bounce on iOS */
   user-select: none; /* Prevent text selection */
   -webkit-user-select: none; /* Safari */
+  
+  /* Background Pattern */
+  background-image: radial-gradient(#e2e8f0 2px, transparent 2px);
+  background-size: 32px 32px;
 }
 
 /* Custom utility for no-select */

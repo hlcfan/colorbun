@@ -17,25 +17,29 @@ export default function CategoryTabs() {
   const { currentCategory, setCategory } = useAppStore();
 
   return (
-    <div className="flex flex-row gap-4 p-4 overflow-x-auto no-scrollbar justify-center items-center w-full bg-white/50 backdrop-blur-sm rounded-b-3xl shadow-soft">
+    <div className="flex flex-row gap-4 p-4 overflow-x-auto no-scrollbar justify-center items-center w-full">
       {CATEGORIES.map((cat) => {
         const Icon = ICON_MAP[cat.icon] || Cat;
         const isActive = currentCategory === cat.id;
-        
+
         return (
           <button
             key={cat.id}
             onClick={() => setCategory(cat.id)}
             className={`
               flex flex-col items-center justify-center
-              w-20 h-20 rounded-2xl transition-all duration-300
-              ${isActive ? `${cat.color} scale-110 shadow-md` : 'bg-white hover:bg-gray-50 scale-100 border-2 border-transparent'}
+              w-20 h-20 rounded-2xl transition-all duration-150
+              border-[3px] border-[var(--btn-border)]
+              ${isActive
+                ? `${cat.color} translate-y-[4px] shadow-none`
+                : 'bg-white hover:bg-yellow-50 shadow-[0_4px_0_var(--btn-border)] active:translate-y-[4px] active:shadow-none'
+              }
             `}
             aria-label={cat.label}
           >
-            <Icon size={32} className={isActive ? 'text-gray-800' : 'text-gray-400'} />
+            <Icon size={32} className={isActive ? 'text-gray-900' : 'text-gray-500'} strokeWidth={2.5} />
             {/* Text is hidden for toddlers but good for debugging/accessibility */}
-            <span className="text-[10px] font-bold mt-1 text-gray-600 uppercase tracking-wider hidden sm:block">
+            <span className={`text-[12px] font-bold mt-1 uppercase tracking-wider hidden sm:block ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
               {cat.label}
             </span>
           </button>

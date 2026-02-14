@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Paintbrush, PaintBucket, Eraser, Undo2, Redo2, Download } from "lucide-react";
 import { audio } from "@/lib/audio";
 import { BRUSHES, BrushType } from '@/lib/brushes';
+import { Button } from './Button';
 
 export type ToolType = 'brush' | 'fill' | 'eraser';
 
@@ -43,11 +44,8 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
 
   const handleBrushClick = () => {
     if (currentTool === 'brush') {
-      // If already selected, toggle popover
       setIsBrushOpen(!isBrushOpen);
     } else {
-      // If switching to brush, select it and open popover if desired? 
-      // User said "click on the brush icon shows a tooltip"
       onSelectTool('brush');
       setIsBrushOpen(true);
     }
@@ -64,45 +62,48 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
   const handleToolSelect = (tool: ToolType) => {
     audio.play('tap');
     onSelectTool(tool);
-    setIsBrushOpen(false); // Close brush popover if other tool selected
+    setIsBrushOpen(false);
   };
 
   const activeBrushDef = BRUSHES[currentBrush];
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft justify-center items-center w-full">
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] justify-center items-center w-full">
       
       {/* Brush Tool with Popover */}
       <div className="relative" ref={brushContainerRef}>
-        <ToolButton
-          isActive={currentTool === 'brush'}
+        <Button
+          variant="icon"
+          size="icon"
+          active={currentTool === 'brush'}
           onClick={handleBrushClick}
-          icon={activeBrushDef.icon} // Show currently selected brush icon
-          label={activeBrushDef.label}
-          color="text-blue-500" // Keep consistent blue for brush tool active state
-        />
+          color="text-blue-500"
+          title={activeBrushDef.label}
+        >
+          <activeBrushDef.icon size={28} strokeWidth={2.5} />
+        </Button>
         
         {isBrushOpen && (
-          <div className="absolute right-full top-0 mr-4 p-4 bg-white/95 backdrop-blur rounded-2xl shadow-xl flex flex-col gap-3 w-48 z-50 animate-in fade-in zoom-in-95 duration-200 items-start pointer-events-auto">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2">Brushes</h3>
+          <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-2xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] flex flex-col gap-3 w-48 z-50 animate-in fade-in zoom-in-95 duration-200 items-start pointer-events-auto">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2 font-fredoka">Brushes</h3>
             {Object.values(BRUSHES).map((brush) => (
               <button
                 key={brush.id}
                 onMouseDown={(e) => {
-                  e.preventDefault(); // Prevent focus loss
-                  e.stopPropagation(); // Stop propagation to document
+                  e.preventDefault();
+                  e.stopPropagation();
                   handleBrushSelect(brush.id);
                 }}
                 className={`
-                  flex items-center gap-3 w-full p-2 rounded-xl transition-all
+                  flex items-center gap-3 w-full p-2 rounded-xl transition-all font-bold
                   ${currentBrush === brush.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600'}
                 `}
               >
                 <div className={`
-                  w-10 h-10 rounded-lg flex items-center justify-center
-                  ${currentBrush === brush.id ? 'bg-blue-100' : 'bg-gray-100'}
+                  w-10 h-10 rounded-lg flex items-center justify-center border-2
+                  ${currentBrush === brush.id ? 'bg-blue-100 border-blue-200' : 'bg-gray-100 border-gray-200'}
                 `}>
-                  <brush.icon size={20} />
+                  <brush.icon size={20} strokeWidth={2.5} />
                 </div>
                 <span className="font-medium text-sm">{brush.label}</span>
               </button>
@@ -111,21 +112,27 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
         )}
       </div>
       
-      <ToolButton
-        isActive={currentTool === 'fill'}
+      <Button
+        variant="icon"
+        size="icon"
+        active={currentTool === 'fill'}
         onClick={() => handleToolSelect('fill')}
-        icon={FILL_TOOL.icon}
-        label={FILL_TOOL.label}
         color={FILL_TOOL.color}
-      />
+        title={FILL_TOOL.label}
+      >
+        <FILL_TOOL.icon size={28} strokeWidth={2.5} />
+      </Button>
       
-      <ToolButton
-        isActive={currentTool === 'eraser'}
+      <Button
+        variant="icon"
+        size="icon"
+        active={currentTool === 'eraser'}
         onClick={() => handleToolSelect('eraser')}
-        icon={ERASER_TOOL.icon}
-        label={ERASER_TOOL.label}
         color={ERASER_TOOL.color}
-      />
+        title={ERASER_TOOL.label}
+      >
+        <ERASER_TOOL.icon size={28} strokeWidth={2.5} />
+      </Button>
     </div>
   );
 }
@@ -137,64 +144,41 @@ export function Actions({ onUndo, onRedo, onExport, canUndo = false, canRedo = f
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft justify-center items-center w-full">
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] justify-center items-center w-full">
       <div className="flex gap-2 w-full justify-center">
-        <ActionButton
+        <Button
+          variant="icon"
+          size="sm"
           onClick={() => handleActionClick(onUndo)}
-          icon={Undo2}
-          label="Undo"
-          color="text-gray-600"
           disabled={!canUndo}
-        />
-        <ActionButton
-          onClick={() => handleActionClick(onRedo)}
-          icon={Redo2}
-          label="Redo"
           color="text-gray-600"
+          title="Undo"
+          className="w-12 h-12 p-0"
+        >
+          <Undo2 size={24} strokeWidth={2.5} />
+        </Button>
+        <Button
+          variant="icon"
+          size="sm"
+          onClick={() => handleActionClick(onRedo)}
           disabled={!canRedo}
-        />
+          color="text-gray-600"
+          title="Redo"
+          className="w-12 h-12 p-0"
+        >
+          <Redo2 size={24} strokeWidth={2.5} />
+        </Button>
       </div>
       
-      <ActionButton
+      <Button
+        variant="icon"
+        size="icon"
         onClick={() => handleActionClick(onExport)}
-        icon={Download}
-        label="Save"
         color="text-green-600"
-      />
+        title="Save"
+      >
+        <Download size={28} strokeWidth={2.5} />
+      </Button>
     </div>
-  );
-}
-
-function ActionButton({ onClick, icon: Icon, label, color, disabled }: any) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`
-        flex flex-col items-center justify-center w-12 h-12 transition-all duration-200
-        ${disabled ? 'opacity-30 cursor-not-allowed' : 'opacity-100 hover:scale-110 active:scale-95'}
-      `}
-      title={label}
-    >
-      <Icon size={28} className={color} />
-    </button>
-  );
-}
-
-function ToolButton({ isActive, onClick, icon: Icon, label, color, disabled }: any) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`
-        flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all duration-200 border-4
-        ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100 border-transparent' : ''}
-        ${isActive ? 'bg-blue-50 shadow-inner scale-95 ring-4 ring-blue-100 border-white' : disabled ? '' : 'bg-white shadow-soft border-white hover:scale-105'}
-      `}
-      title={label}
-    >
-      <Icon size={28} className={isActive ? color : disabled ? 'text-gray-300' : 'text-gray-400'} />
-      {/* <span className="text-[10px] font-bold mt-1 text-gray-500">{label}</span> */}
-    </button>
   );
 }

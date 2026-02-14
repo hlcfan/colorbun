@@ -16,20 +16,20 @@ export default function ShapeGrid() {
           <Link
             key={shape.id}
             href={`/color/${shape.categoryId}/${shape.id}`}
-            className="group relative aspect-square bg-white rounded-3xl shadow-card border-4 border-transparent hover:border-blue-200 transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center overflow-hidden"
+            className="group relative aspect-square bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] hover:-translate-y-1 hover:shadow-[6px_6px_0_var(--shadow-color)] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--shadow-color)] transition-all duration-200 flex items-center justify-center overflow-hidden"
           >
-            <div className="absolute inset-0 bg-white p-4 flex items-center justify-center">
+            <div className="absolute inset-0 bg-white p-6 flex items-center justify-center">
               <img 
                 src={shape.src} 
                 alt={shape.name}
-                className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity"
+                className="w-full h-full object-contain opacity-90 group-hover:scale-110 transition-transform duration-300"
               />
             </div>
             
             {/* "Play" overlay on hover */}
             <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="bg-white p-4 rounded-full shadow-lg">
-                <Play fill="currentColor" className="text-green-400 ml-1" />
+              <div className="bg-yellow-400 p-4 rounded-full border-[3px] border-[var(--btn-border)] shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
+                <Play fill="currentColor" className="text-white ml-1" size={32} />
               </div>
             </div>
           </Link>
@@ -38,7 +38,7 @@ export default function ShapeGrid() {
         {/* Empty state filler if needed */}
         {shapes.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
-            <p className="text-xl">Coming Soon!</p>
+            <p className="text-2xl font-bold font-fredoka text-gray-300">Coming Soon!</p>
           </div>
         )}
       </div>

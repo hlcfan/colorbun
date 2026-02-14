@@ -8,6 +8,7 @@ import { Tools, Actions, ToolType } from '@/components/Toolbar';
 import CanvasBoard from '@/components/CanvasBoard';
 import { ArrowLeft } from 'lucide-react';
 import { BrushType } from '@/lib/brushes';
+import { Button } from './Button';
 
 interface ColoringScreenProps {
   categoryId: string;
@@ -29,40 +30,39 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
 
   if (!shape) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold mb-4">Shape not found</h1>
-        <button
-          onClick={() => router.back()}
-          className="px-6 py-2 bg-blue-500 text-white rounded-full"
-        >
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h1 className="text-3xl font-black font-fredoka text-gray-400">Shape not found</h1>
+        <Button onClick={() => router.back()}>
           Go Back
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <main className="flex flex-col h-screen w-full bg-[#fdfbf7] overflow-hidden">
+    <main className="flex flex-col h-screen w-full overflow-hidden">
       {/* Top Bar */}
-      <div className="flex-none h-16 px-4 flex items-center justify-between">
-        <button
+      <div className="flex-none h-20 px-6 flex items-center justify-between">
+        <Button
+          variant="icon"
+          size="icon"
           onClick={() => router.back()}
-          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-soft hover:scale-105 transition-transform"
+          title="Go Back"
         >
-          <ArrowLeft size={24} className="text-gray-600" />
-        </button>
+          <ArrowLeft size={32} strokeWidth={3} className="text-gray-600" />
+        </Button>
 
-        <h1 className="text-xl font-bold text-gray-500 uppercase tracking-widest">
+        <h1 className="text-2xl font-black text-gray-600 uppercase tracking-widest font-fredoka drop-shadow-sm">
           {shape.name}
         </h1>
 
-        <div className="w-12" /> {/* Spacer for balance */}
+        <div className="w-14" /> {/* Spacer for balance */}
       </div>
 
       {/* Main Workspace */}
-      <div className="flex-1 flex gap-4 p-4 min-h-0">
+      <div className="flex-1 flex gap-6 p-6 min-h-0 pt-0">
         {/* Left: Canvas */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[6px_6px_0_var(--shadow-color)] overflow-hidden relative">
           <CanvasBoard
             tool={currentTool}
             color={selectedColor}
@@ -78,7 +78,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
         </div>
 
         {/* Right: Panel (Palette, Tools, Actions) */}
-        <div className="flex-none w-32 flex flex-col gap-4 items-center justify-center relative z-50">
+        <div className="flex-none w-24 flex flex-col gap-6 items-center justify-center relative z-50">
           <div className="flex-none">
             <Palette
               selectedColor={selectedColor}
@@ -98,12 +98,15 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
             onSelectBrush={setCurrentBrush}
           />
           
-          <Actions
-            onUndo={() => setUndoTrigger(prev => prev + 1)}
-            onRedo={() => setRedoTrigger(prev => prev + 1)}
-            onExport={() => {}} // TODO: Implement Export
-            canUndo={canUndo}
-            canRedo={canRedo}
+          <Actions 
+             onUndo={() => setUndoTrigger(prev => prev + 1)}
+             onRedo={() => setRedoTrigger(prev => prev + 1)}
+             onExport={() => {
+               // Placeholder for export logic
+               console.log("Export triggered");
+             }}
+             canUndo={canUndo}
+             canRedo={canRedo}
           />
         </div>
       </div>
