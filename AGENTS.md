@@ -72,6 +72,7 @@ BunnyMascot.tsx
 
 /lib
 shapes.ts -> registry
+brushes.ts -> brush definitions
 canvas.ts -> paint engine
 export.ts -> image download
 audio.ts -> sound manager
@@ -128,10 +129,10 @@ Layer 1 → SVG outlines (immutable)
 Layer 2 → bitmap paint layer
 
 ### Tools
-- Brush
+- Brush (Marker, Pencil, Highlighter)
 - Fill bucket
 - Eraser
-- Undo
+- Undo / Redo
 - Clear
 
 ---
@@ -153,8 +154,10 @@ Goal: reliable fill detection.
 currentCategory
 currentShape
 selectedColor
-tool
+currentTool
+currentBrush
 history[]
+redoStack[]
 
 
 Keep it simple and predictable.
@@ -280,11 +283,19 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
 
 ### ✅ Completed
 - **Project Structure**: Next.js 16, Tailwind, TypeScript initialized.
-- **Core UI**: Home screen, Category Tabs, Shape Grid, Toolbar, Palette.
+- **Core UI**:
+  - Home screen, Category Tabs, Shape Grid.
+  - **Toolbar**: Split into Tools and Actions, standalone buttons for Fill/Eraser.
+  - **Palette**: Popover interaction for color selection.
+  - **Layout**: Optimized Left Canvas / Right Panel layout.
 - **Coloring Engine**:
-  - Implemented **Dual-Canvas System** (Paint Layer bottom, SVG Outline top).
+  - **Dual-Canvas System** (Paint Layer bottom, SVG Outline top).
   - **Flood Fill** algorithm with boundary detection.
-  - **Brush** and **Eraser** tools.
+  - **Brush System**: Multiple brush types (Marker, Pencil, Highlighter) with custom opacity/width.
+  - **Undo/Redo**: Full history stack implementation.
+- **Touch Optimization**:
+  - Global text selection disabled (`user-select: none`).
+  - Event propagation fixes for popovers.
 - **Assets**:
   - 7 Custom SVGs created across 6 categories.
   - All SVGs optimized with `fill="none"` for the coloring engine.
@@ -292,6 +303,5 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
 
 ### 🚧 Pending / In Progress
 - **Export**: Image download logic needs implementation.
-- **Undo/Redo**: History stack not yet implemented.
 - **Audio**: Sound files need to be added (currently placeholders).
 - **Mascot**: Bunny mascot component not yet built.
