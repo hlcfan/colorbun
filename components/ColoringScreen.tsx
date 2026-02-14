@@ -7,6 +7,7 @@ import Palette from '@/components/Palette';
 import { Tools, Actions, ToolType } from '@/components/Toolbar';
 import CanvasBoard from '@/components/CanvasBoard';
 import { ArrowLeft } from 'lucide-react';
+import { BrushType } from '@/lib/brushes';
 
 interface ColoringScreenProps {
   categoryId: string;
@@ -18,6 +19,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
 
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
   const [currentTool, setCurrentTool] = useState<ToolType>('brush');
+  const [currentBrush, setCurrentBrush] = useState<BrushType>('marker');
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [undoTrigger, setUndoTrigger] = useState(0);
@@ -65,6 +67,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
             tool={currentTool}
             color={selectedColor}
             outlineSrc={shape.src}
+            currentBrush={currentBrush}
             onHistoryChange={(undo, redo) => {
               setCanUndo(undo);
               setCanRedo(redo);
@@ -75,7 +78,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
         </div>
 
         {/* Right: Panel (Palette, Tools, Actions) */}
-        <div className="flex-none w-32 flex flex-col gap-4 items-center justify-center">
+        <div className="flex-none w-32 flex flex-col gap-4 items-center justify-center relative z-50">
           <div className="flex-none">
             <Palette
               selectedColor={selectedColor}
@@ -90,7 +93,9 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
           
           <Tools
             currentTool={currentTool}
+            currentBrush={currentBrush}
             onSelectTool={setCurrentTool}
+            onSelectBrush={setCurrentBrush}
           />
           
           <Actions

@@ -3,12 +3,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { Paintbrush, PaintBucket, Eraser, Undo2, Redo2, Download } from "lucide-react";
 import { audio } from "@/lib/audio";
+import { BRUSHES, BrushType } from '@/lib/brushes';
 
 export type ToolType = 'brush' | 'fill' | 'eraser';
 
 interface ToolsProps {
   currentTool: ToolType;
+  currentBrush: BrushType;
   onSelectTool: (tool: ToolType) => void;
+  onSelectBrush: (brush: BrushType) => void;
 }
 
 interface ActionsProps {
@@ -19,20 +22,17 @@ interface ActionsProps {
   canRedo?: boolean;
 }
 
-const TOOLS = [
-  { id: 'brush', icon: Paintbrush, label: 'Brush', color: 'text-blue-500' },
-  { id: 'fill', icon: PaintBucket, label: 'Fill', color: 'text-orange-500' },
-  { id: 'eraser', icon: Eraser, label: 'Eraser', color: 'text-pink-500' },
-] as const;
+const FILL_TOOL = { id: 'fill', icon: PaintBucket, label: 'Fill', color: 'text-orange-500' };
+const ERASER_TOOL = { id: 'eraser', icon: Eraser, label: 'Eraser', color: 'text-pink-500' };
 
-export function Tools({ currentTool, onSelectTool }: ToolsProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }: ToolsProps) {
+  const [isBrushOpen, setIsBrushOpen] = useState(false);
+  const brushContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+      if (brushContainerRef.current && !brushContainerRef.current.contains(event.target as Node)) {
+        setIsBrushOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -41,51 +41,91 @@ export function Tools({ currentTool, onSelectTool }: ToolsProps) {
     };
   }, []);
 
-  const handleToggle = () => {
+  const handleBrushClick = () => {
+    if (currentTool === 'brush') {
+      // If already selected, toggle popover
+      setIsBrushOpen(!isBrushOpen);
+    } else {
+      // If switching to brush, select it and open popover if desired? 
+      // User said "click on the brush icon shows a tooltip"
+      onSelectTool('brush');
+      setIsBrushOpen(true);
+    }
     audio.play('tap');
-    setIsOpen(!isOpen);
+  };
+
+  const handleBrushSelect = (brushId: BrushType) => {
+    audio.play('tap');
+    onSelectBrush(brushId);
+    onSelectTool('brush');
+    setIsBrushOpen(false);
   };
 
   const handleToolSelect = (tool: ToolType) => {
     audio.play('tap');
     onSelectTool(tool);
-    setIsOpen(false);
+    setIsBrushOpen(false); // Close brush popover if other tool selected
   };
 
-  // Find the active tool definition to display its icon
-  const activeToolDef = TOOLS.find(t => t.id === currentTool) || TOOLS[0];
-  const ActiveIcon = activeToolDef.icon;
+  const activeBrushDef = BRUSHES[currentBrush];
 
   return (
-    <div className="relative w-full flex justify-center" ref={containerRef}>
-      <button
-        onClick={handleToggle}
-        className={`
-          w-16 h-16 rounded-xl shadow-soft flex items-center justify-center transition-all duration-200 active:scale-95 border-4
-          ${isOpen ? 'ring-4 ring-blue-100 scale-105 border-white bg-blue-50' : 'border-white hover:scale-105 bg-white'}
-        `}
-        aria-label="Open tools menu"
-      >
-        <ActiveIcon 
-          className={`drop-shadow-md ${activeToolDef.color}`} 
-          size={32} 
+    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-2xl shadow-soft justify-center items-center w-full">
+      
+      {/* Brush Tool with Popover */}
+      <div className="relative" ref={brushContainerRef}>
+        <ToolButton
+          isActive={currentTool === 'brush'}
+          onClick={handleBrushClick}
+          icon={activeBrushDef.icon} // Show currently selected brush icon
+          label={activeBrushDef.label}
+          color="text-blue-500" // Keep consistent blue for brush tool active state
         />
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-full top-0 mr-4 p-4 bg-white/95 backdrop-blur rounded-2xl shadow-xl flex flex-col gap-3 w-24 z-50 animate-in fade-in zoom-in-95 duration-200 items-center">
-          {TOOLS.map((tool) => (
-            <ToolButton
-              key={tool.id}
-              isActive={currentTool === tool.id}
-              onClick={() => handleToolSelect(tool.id as ToolType)}
-              icon={tool.icon}
-              label={tool.label}
-              color={tool.color}
-            />
-          ))}
-        </div>
-      )}
+        
+        {isBrushOpen && (
+          <div className="absolute right-full top-0 mr-4 p-4 bg-white/95 backdrop-blur rounded-2xl shadow-xl flex flex-col gap-3 w-48 z-50 animate-in fade-in zoom-in-95 duration-200 items-start pointer-events-auto">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2">Brushes</h3>
+            {Object.values(BRUSHES).map((brush) => (
+              <button
+                key={brush.id}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // Prevent focus loss
+                  e.stopPropagation(); // Stop propagation to document
+                  handleBrushSelect(brush.id);
+                }}
+                className={`
+                  flex items-center gap-3 w-full p-2 rounded-xl transition-all
+                  ${currentBrush === brush.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600'}
+                `}
+              >
+                <div className={`
+                  w-10 h-10 rounded-lg flex items-center justify-center
+                  ${currentBrush === brush.id ? 'bg-blue-100' : 'bg-gray-100'}
+                `}>
+                  <brush.icon size={20} />
+                </div>
+                <span className="font-medium text-sm">{brush.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      <ToolButton
+        isActive={currentTool === 'fill'}
+        onClick={() => handleToolSelect('fill')}
+        icon={FILL_TOOL.icon}
+        label={FILL_TOOL.label}
+        color={FILL_TOOL.color}
+      />
+      
+      <ToolButton
+        isActive={currentTool === 'eraser'}
+        onClick={() => handleToolSelect('eraser')}
+        icon={ERASER_TOOL.icon}
+        label={ERASER_TOOL.label}
+        color={ERASER_TOOL.color}
+      />
     </div>
   );
 }
@@ -147,9 +187,9 @@ function ToolButton({ isActive, onClick, icon: Icon, label, color, disabled }: a
       onClick={onClick}
       disabled={disabled}
       className={`
-        flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all duration-200
-        ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}
-        ${isActive ? 'bg-blue-50 shadow-inner scale-95 ring-2 ring-blue-200' : disabled ? '' : 'bg-white shadow-sm hover:bg-gray-50 scale-100'}
+        flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all duration-200 border-4
+        ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100 border-transparent' : ''}
+        ${isActive ? 'bg-blue-50 shadow-inner scale-95 ring-4 ring-blue-100 border-white' : disabled ? '' : 'bg-white shadow-soft border-white hover:scale-105'}
       `}
       title={label}
     >

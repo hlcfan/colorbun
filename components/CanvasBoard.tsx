@@ -4,17 +4,19 @@ import { useRef, useEffect, useState } from 'react';
 import { drawLine, floodFill, Point } from '@/lib/canvas';
 import { ToolType } from './Toolbar';
 import { audio } from '@/lib/audio';
+import { BRUSHES, BrushType } from '@/lib/brushes';
 
 interface CanvasBoardProps {
   tool: ToolType;
   color: string;
   outlineSrc: string; // URL to the SVG outline
+  currentBrush: BrushType;
   onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
   undoTrigger?: number; // Increment this to trigger undo
   redoTrigger?: number; // Increment this to trigger redo
 }
 
-export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, undoTrigger, redoTrigger }: CanvasBoardProps) {
+export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger, redoTrigger }: CanvasBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,52 +84,6 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
       if (!paintCanvas) return;
       const ctx = paintCanvas.getContext('2d');
       if (!ctx) return;
-
-      // Save current state to undo history before redoing
-      // Actually, standard redo implementation:
-      // pop from redo stack, push CURRENT state to undo stack, apply redo state.
-      // Wait, usually:
-      // Undo: pop history, push current to redo, apply history
-      // Redo: pop redo, push current to history, apply redo
-      
-      // Let's refine the logic.
-      // Ideally history contains PAST states.
-      // Current state is on canvas.
-      
-      // Correct Undo Flow:
-      // 1. Save CURRENT canvas to redo stack
-      // 2. Pop PREVIOUS state from history
-      // 3. Put PREVIOUS state on canvas
-      
-      // Correct Redo Flow:
-      // 1. Save CURRENT canvas to history
-      // 2. Pop NEXT state from redo stack
-      // 3. Put NEXT state on canvas
-      
-      // My implementation of Undo was: 
-      // previousState = history.pop() -> putImageData(previousState)
-      // This assumes history stores the state *before* the current one.
-      // So when I draw, I must saveToHistory() *before* applying changes?
-      // Yes, line 129/140 calls saveToHistory().
-      
-      // So historyRef contains snapshots of canvas BEFORE each operation.
-      // Current canvas shows the result of the latest operation.
-      
-      // UNDO:
-      // 1. We need to save the CURRENT state to redo stack so we can return to it.
-      //    currentImageData = ctx.getImageData(...)
-      //    redoStack.push(currentImageData)
-      // 2. Pop the last state from history.
-      //    previousState = history.pop()
-      // 3. Restore previousState.
-      
-      // REDO:
-      // 1. We need to save the CURRENT state (which is a past state now) to history.
-      //    currentImageData = ctx.getImageData(...)
-      //    history.push(currentImageData)
-      // 2. Pop state from redo stack.
-      //    nextState = redoStack.pop()
-      // 3. Restore nextState.
       
       const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
       historyRef.current.push(currentImageData);
@@ -225,20 +181,28 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
       lastPoint.current = point;
 
       // Draw a dot for immediate feedback
-      // Eraser uses 'destination-out' to clear paint
       if (tool === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
-      } else {
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 20, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
+      } else {
+        // Handle Brush Styles
+        ctx.globalCompositeOperation = 'source-over';
+        
+        const brushConfig = BRUSHES[currentBrush];
+        ctx.fillStyle = color;
+        ctx.globalAlpha = brushConfig.opacity;
+        
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, brushConfig.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Reset alpha for safety, though we set it every time
+        ctx.globalAlpha = 1.0;
       }
-
-      ctx.fillStyle = tool === 'eraser' ? '#000000' : color; // Color doesn't matter for eraser
-      ctx.beginPath();
-      ctx.arc(point.x, point.y, tool === 'eraser' ? 20 : 10, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Reset composite op
-      ctx.globalCompositeOperation = 'source-over';
 
       // Play brush sound (throttled in a real app, but here just on start)
       audio.play('brush');
@@ -253,19 +217,21 @@ export default function CanvasBoard({ tool, color, outlineSrc, onHistoryChange, 
     if (!ctx) return;
 
     const currentPoint = getPoint(e);
-    const drawColor = tool === 'eraser' ? '#000000' : color;
-    const lineWidth = tool === 'eraser' ? 40 : 20;
 
     if (tool === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out';
+      drawLine(ctx, lastPoint.current, currentPoint, '#000000', 40);
+      ctx.globalCompositeOperation = 'source-over';
     } else {
       ctx.globalCompositeOperation = 'source-over';
+      const brushConfig = BRUSHES[currentBrush];
+      
+      ctx.globalAlpha = brushConfig.opacity;
+      drawLine(ctx, lastPoint.current, currentPoint, color, brushConfig.lineWidth);
+      ctx.globalAlpha = 1.0;
     }
-
-    drawLine(ctx, lastPoint.current, currentPoint, drawColor, lineWidth);
+    
     lastPoint.current = currentPoint;
-
-    ctx.globalCompositeOperation = 'source-over';
   };
 
   const stopDrawing = () => {
