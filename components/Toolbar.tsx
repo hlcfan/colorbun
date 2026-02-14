@@ -49,7 +49,7 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
       onSelectTool('brush');
       setIsBrushOpen(true);
     }
-    audio.play('tap');
+    // audio.play('tap'); // Handled by Button
   };
 
   const handleBrushSelect = (brushId: BrushType) => {
@@ -60,7 +60,7 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
   };
 
   const handleToolSelect = (tool: ToolType) => {
-    audio.play('tap');
+    // audio.play('tap'); // Handled by Button
     onSelectTool(tool);
     setIsBrushOpen(false);
   };
@@ -139,7 +139,7 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
 
 export function Actions({ onUndo, onRedo, onExport, canUndo = false, canRedo = false }: ActionsProps) {
   const handleActionClick = (action: () => void) => {
-    audio.play('tap');
+    // audio.play('tap'); // Handled by Button
     action();
   };
 

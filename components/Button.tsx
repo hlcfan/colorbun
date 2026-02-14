@@ -1,4 +1,5 @@
 import React from 'react';
+import { audio } from '@/lib/audio';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'icon' | 'ghost';
@@ -55,8 +56,20 @@ export function Button({
     ${className}
   `;
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!disabled) {
+      audio.play('tap');
+      props.onClick?.(e);
+    }
+  };
+
   return (
-    <button className={finalClassName.trim().replace(/\s+/g, ' ')} disabled={disabled} {...props}>
+    <button 
+      className={finalClassName.trim().replace(/\s+/g, ' ')} 
+      disabled={disabled} 
+      {...props}
+      onClick={handleClick}
+    >
       {children}
     </button>
   );

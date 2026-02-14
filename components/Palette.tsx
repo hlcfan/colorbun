@@ -41,7 +41,7 @@ export default function Palette({ selectedColor, onSelectColor }: PaletteProps) 
   }, []);
 
   const handleToggle = () => {
-    audio.play('tap');
+    // audio.play('tap'); // Handled by Button
     setIsOpen(!isOpen);
   };
 

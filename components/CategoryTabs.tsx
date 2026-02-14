@@ -2,6 +2,7 @@
 
 import { CATEGORIES, CategoryId } from "@/lib/shapes";
 import { useAppStore } from "@/lib/store";
+import { audio } from "@/lib/audio";
 import { Cat, Car, Apple, Fish, Rocket, Skull } from "lucide-react"; // Skull as Dino placeholder
 
 const ICON_MAP: Record<string, any> = {
@@ -25,7 +26,10 @@ export default function CategoryTabs() {
         return (
           <button
             key={cat.id}
-            onClick={() => setCategory(cat.id)}
+            onClick={() => {
+              audio.play('tap');
+              setCategory(cat.id);
+            }}
             className={`
               flex flex-col items-center justify-center
               w-20 h-20 rounded-2xl transition-all duration-150

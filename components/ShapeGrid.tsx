@@ -2,6 +2,7 @@
 
 import { getShapesByCategory } from "@/lib/shapes";
 import { useAppStore } from "@/lib/store";
+import { audio } from "@/lib/audio";
 import Link from "next/link";
 import { Play } from "lucide-react";
 
@@ -16,6 +17,7 @@ export default function ShapeGrid() {
           <Link
             key={shape.id}
             href={`/color/${shape.categoryId}/${shape.id}`}
+            onClick={() => audio.play('tap')}
             className="group relative aspect-square bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] hover:-translate-y-1 hover:shadow-[6px_6px_0_var(--shadow-color)] active:translate-y-[2px] active:shadow-[2px_2px_0_var(--shadow-color)] transition-all duration-200 flex items-center justify-center overflow-hidden"
           >
             <div className="absolute inset-0 bg-white p-6 flex items-center justify-center">
