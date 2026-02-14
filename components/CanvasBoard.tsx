@@ -1,10 +1,15 @@
 "use client";
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { drawLine, floodFill, Point } from '@/lib/canvas';
 import { ToolType } from './Toolbar';
 import { audio } from '@/lib/audio';
 import { BRUSHES, BrushType } from '@/lib/brushes';
+import { exportCanvasAsImage } from '@/lib/export';
+
+export interface CanvasBoardHandle {
+  exportImage: (fileName?: string) => void;
+}
 
 interface CanvasBoardProps {
   tool: ToolType;
@@ -16,12 +21,22 @@ interface CanvasBoardProps {
   redoTrigger?: number; // Increment this to trigger redo
 }
 
-export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger, redoTrigger }: CanvasBoardProps) {
+const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger, redoTrigger }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPoint = useRef<Point | null>(null);
+
+  // Expose export function via ref
+  useImperativeHandle(ref, () => ({
+    exportImage: (fileName?: string) => {
+      if (paintCanvasRef.current && outlineCanvasRef.current) {
+        exportCanvasAsImage(paintCanvasRef.current, outlineCanvasRef.current, fileName);
+        audio.play('success'); // Play success sound on export
+      }
+    }
+  }));
 
   // History management
   const historyRef = useRef<ImageData[]>([]);
@@ -41,7 +56,7 @@ export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onH
     if (historyRef.current.length > MAX_HISTORY) {
       historyRef.current.shift();
     }
-    
+
     // Clear redo stack when new action is performed
     redoStackRef.current = [];
 
@@ -84,15 +99,15 @@ export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onH
       if (!paintCanvas) return;
       const ctx = paintCanvas.getContext('2d');
       if (!ctx) return;
-      
+
       const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
       historyRef.current.push(currentImageData);
-      
+
       const nextState = redoStackRef.current.pop();
       if (nextState) {
         ctx.putImageData(nextState, 0, 0);
       }
-      
+
       onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
     }
   }, [redoTrigger]);
@@ -191,15 +206,15 @@ export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onH
       } else {
         // Handle Brush Styles
         ctx.globalCompositeOperation = 'source-over';
-        
+
         const brushConfig = BRUSHES[currentBrush];
         ctx.fillStyle = color;
         ctx.globalAlpha = brushConfig.opacity;
-        
+
         ctx.beginPath();
         ctx.arc(point.x, point.y, brushConfig.lineWidth / 2, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Reset alpha for safety, though we set it every time
         ctx.globalAlpha = 1.0;
       }
@@ -225,12 +240,12 @@ export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onH
     } else {
       ctx.globalCompositeOperation = 'source-over';
       const brushConfig = BRUSHES[currentBrush];
-      
+
       ctx.globalAlpha = brushConfig.opacity;
       drawLine(ctx, lastPoint.current, currentPoint, color, brushConfig.lineWidth);
       ctx.globalAlpha = 1.0;
     }
-    
+
     lastPoint.current = currentPoint;
   };
 
@@ -264,4 +279,8 @@ export default function CanvasBoard({ tool, color, outlineSrc, currentBrush, onH
       />
     </div>
   );
-}
+});
+
+CanvasBoard.displayName = 'CanvasBoard';
+
+export default CanvasBoard;

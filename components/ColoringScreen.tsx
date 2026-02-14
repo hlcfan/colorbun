@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { SHAPES } from '@/lib/shapes';
 import Palette from '@/components/Palette';
 import { Tools, Actions, ToolType } from '@/components/Toolbar';
-import CanvasBoard from '@/components/CanvasBoard';
+import CanvasBoard, { CanvasBoardHandle } from '@/components/CanvasBoard';
 import { ArrowLeft } from 'lucide-react';
 import { BrushType } from '@/lib/brushes';
 import { Button } from './Button';
@@ -17,6 +17,7 @@ interface ColoringScreenProps {
 
 export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenProps) {
   const router = useRouter();
+  const canvasRef = useRef<CanvasBoardHandle>(null);
 
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
   const [currentTool, setCurrentTool] = useState<ToolType>('brush');
@@ -25,7 +26,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
   const [canRedo, setCanRedo] = useState(false);
   const [undoTrigger, setUndoTrigger] = useState(0);
   const [redoTrigger, setRedoTrigger] = useState(0);
-  
+
   const shape = SHAPES.find(s => s.id === shapeId && s.categoryId === categoryId);
 
   if (!shape) {
@@ -64,6 +65,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
         {/* Left: Canvas */}
         <div className="flex-1 min-w-0 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[6px_6px_0_var(--shadow-color)] overflow-hidden relative">
           <CanvasBoard
+            ref={canvasRef}
             tool={currentTool}
             color={selectedColor}
             outlineSrc={shape.src}
@@ -90,20 +92,21 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
               }}
             />
           </div>
-          
+
           <Tools
             currentTool={currentTool}
             currentBrush={currentBrush}
             onSelectTool={setCurrentTool}
             onSelectBrush={setCurrentBrush}
           />
-          
-          <Actions 
+
+          <Actions
              onUndo={() => setUndoTrigger(prev => prev + 1)}
              onRedo={() => setRedoTrigger(prev => prev + 1)}
              onExport={() => {
-               // Placeholder for export logic
-               console.log("Export triggered");
+               if (canvasRef.current) {
+                 canvasRef.current.exportImage(`${shape.name.toLowerCase().replace(/\s+/g, '-')}-art.png`);
+               }
              }}
              canUndo={canUndo}
              canRedo={canRedo}

@@ -108,7 +108,14 @@ Keep transitions fast.
 Minimum 44px, prefer 60–80px.
 
 ### Corners
-Rounded everywhere.
+Rounded everywhere (`rounded-2xl` or `rounded-3xl`).
+
+### Design Language: "Chunky & Tactile"
+- **Buttons**: 3D "pop-out" style with thick borders (3px) and hard shadows.
+- **Font**: **Fredoka** (rounded, friendly).
+- **Borders**: 3px solid dark borders (`#2d3748`).
+- **Shadows**: Hard, non-blurred shadows (`4px 4px 0px`).
+- **Background**: Pastel colors with subtle patterns (e.g., polka dots).
 
 ### Text
 Avoid whenever possible.
@@ -117,7 +124,7 @@ Avoid whenever possible.
 Soft pastel, friendly.
 
 ### Feedback
-Every tap = visual or audio response.
+Every tap = visual (squish/bounce) or audio response.
 
 ---
 
@@ -300,8 +307,18 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - 7 Custom SVGs created across 6 categories.
   - All SVGs optimized with `fill="none"` for the coloring engine.
 - **State**: Zustand store connected for navigation.
+- **Visual Redesign**:
+  - Implemented "Chunky & Tactile" design system.
+  - Added `Fredoka` font.
+  - Created reusable `Button` component with 3D press effects.
+  - Applied polka-dot background pattern.
+- **Export**:
+  - Implemented logic to merge paint and outline layers.
+  - Fixed issue with white background transparency using `multiply` blend mode.
+- **Audio**:
+  - Implemented `AudioManager` with `Howler.js`.
+  - Created sound asset directory structure.
 
 ### 🚧 Pending / In Progress
-- **Export**: Image download logic needs implementation.
-- **Audio**: Sound files need to be added (currently placeholders).
+- **Audio Assets**: Sound files need to be added to `public/assets/sounds`.
 - **Mascot**: Bunny mascot component not yet built.
