@@ -111,7 +111,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
       img.onload = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // Draw image scaled to fit, centered
-        const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.9;
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.99;
         const x = (canvas.width - img.width * scale) / 2;
         const y = (canvas.height - img.height * scale) / 2;
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
