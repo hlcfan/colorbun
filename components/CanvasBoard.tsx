@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { drawLine, floodFill, createFloodMask, Point } from '@/lib/canvas';
 import { ToolType } from './Toolbar';
 import { audio } from '@/lib/audio';
@@ -28,6 +28,8 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawing = useRef(false);
   const lastPoint = useRef<Point | null>(null);
+  const outlineImageRef = useRef<HTMLImageElement | null>(null);
+  const layoutRef = useRef<{ x: number, y: number, scale: number } | null>(null);
 
   // Expose export function via ref
   useImperativeHandle(ref, () => ({
@@ -81,51 +83,99 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
 
       onHistoryChange?.(historyRef.current.length > 0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undoTrigger]);
 
-  // Initialize canvas size and load outline
+  // Helper to draw outline and update layout
+  const drawOutline = useCallback(() => {
+    const canvas = outlineCanvasRef.current;
+    const img = outlineImageRef.current;
+    if (!canvas || !img) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const { width, height } = canvas;
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw image scaled to fit, centered
+    const scale = Math.min(width / img.width, height / img.height) * 0.99;
+    const x = (width - img.width * scale) / 2;
+    const y = (height - img.height * scale) / 2;
+
+    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    layoutRef.current = { x, y, scale };
+  }, []);
+
+  // Load outline image
+  useEffect(() => {
+    const img = new Image();
+    img.src = outlineSrc;
+    img.onload = () => {
+      outlineImageRef.current = img;
+      drawOutline();
+    };
+  }, [outlineSrc, drawOutline]);
+
+  // Handle resize with state preservation
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current && paintCanvasRef.current && outlineCanvasRef.current && tempCanvasRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
 
-        // Update all canvases
+        // Check if size actually changed
+        if (paintCanvasRef.current.width === width && paintCanvasRef.current.height === height) return;
+
+        // Ignore invalid dimensions (e.g. when hidden or minimized)
+        if (width === 0 || height === 0) return;
+
+        // 1. Save current paint content
+        let savedPaint: HTMLCanvasElement | null = null;
+        const oldLayout = layoutRef.current;
+
+        if (oldLayout && paintCanvasRef.current.width > 0 && paintCanvasRef.current.height > 0) {
+          savedPaint = document.createElement('canvas');
+          savedPaint.width = paintCanvasRef.current.width;
+          savedPaint.height = paintCanvasRef.current.height;
+          savedPaint.getContext('2d')?.drawImage(paintCanvasRef.current, 0, 0);
+        }
+
+        // 2. Update all canvases
         [paintCanvasRef.current, outlineCanvasRef.current, tempCanvasRef.current].forEach(canvas => {
           canvas.width = width;
           canvas.height = height;
         });
 
-        // Redraw outline after resize
+        // 3. Redraw outline (calculates new layout)
         drawOutline();
+
+        // 4. Restore paint content with transform
+        const newLayout = layoutRef.current;
+        if (savedPaint && oldLayout && newLayout && paintCanvasRef.current) {
+          const ctx = paintCanvasRef.current.getContext('2d');
+          if (ctx) {
+            const scaleRatio = newLayout.scale / oldLayout.scale;
+            ctx.save();
+            ctx.translate(newLayout.x, newLayout.y);
+            ctx.scale(scaleRatio, scaleRatio);
+            ctx.translate(-oldLayout.x, -oldLayout.y);
+            ctx.drawImage(savedPaint, 0, 0);
+            ctx.restore();
+          }
+        }
+
+        // 5. Clear history because dimensions changed
+        historyRef.current = [];
+        onHistoryChange?.(false);
       }
-    };
-
-    const drawOutline = () => {
-      const canvas = outlineCanvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const img = new Image();
-      img.src = outlineSrc;
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Draw image scaled to fit, centered
-        const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.99;
-        const x = (canvas.width - img.width * scale) / 2;
-        const y = (canvas.height - img.height * scale) / 2;
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-      };
     };
 
     updateSize();
     window.addEventListener('resize', updateSize);
 
-    // Also redraw outline when src changes
-    drawOutline();
-
     return () => window.removeEventListener('resize', updateSize);
-  }, [outlineSrc]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawOutline]);
 
   const getPoint = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent): Point => {
     if (!paintCanvasRef.current) return { x: 0, y: 0 };
