@@ -303,6 +303,7 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - **Dual-Canvas System** (Paint Layer bottom, SVG Outline top).
   - **Transparent Background**: Canvas background is transparent for brush/eraser.
   - **Flood Fill** algorithm with boundary detection.
+  - **Smart Brush**: Implemented region-constrained coloring. Brushes automatically respect outline boundaries, preventing coloring outside the lines using a flood-fill generated mask.
   - **Brush System**: Multiple brush types (Marker, Pencil, Highlighter) with custom opacity/width.
   - **Undo**: History stack implementation (Redo removed for simplicity).
 - **Touch Optimization**:

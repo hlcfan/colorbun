@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { drawLine, floodFill, Point } from '@/lib/canvas';
+import { drawLine, floodFill, createFloodMask, Point } from '@/lib/canvas';
 import { ToolType } from './Toolbar';
 import { audio } from '@/lib/audio';
 import { BRUSHES, BrushType } from '@/lib/brushes';
@@ -23,7 +23,9 @@ interface CanvasBoardProps {
 const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
+  const tempCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
+  const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPoint = useRef<Point | null>(null);
 
@@ -84,11 +86,11 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
   // Initialize canvas size and load outline
   useEffect(() => {
     const updateSize = () => {
-      if (containerRef.current && paintCanvasRef.current && outlineCanvasRef.current) {
+      if (containerRef.current && paintCanvasRef.current && outlineCanvasRef.current && tempCanvasRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
 
-        // Update both canvases
-        [paintCanvasRef.current, outlineCanvasRef.current].forEach(canvas => {
+        // Update all canvases
+        [paintCanvasRef.current, outlineCanvasRef.current, tempCanvasRef.current].forEach(canvas => {
           canvas.width = width;
           canvas.height = height;
         });
@@ -164,6 +166,26 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
 
       lastPoint.current = point;
 
+      // Prepare temp canvas for brush strokes
+      const tempCanvas = tempCanvasRef.current;
+      if (tempCanvas) {
+        const tempCtx = tempCanvas.getContext('2d');
+        if (tempCtx) {
+          tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+          // Generate mask if using a brush (not eraser)
+          if (tool !== 'eraser') {
+            const outlineCtx = outlineCanvasRef.current?.getContext('2d');
+            // Create mask based on start point
+            // We pass the paint context to sample the start color (usually white/transparent)
+            // And outline context to detect boundaries
+            maskCanvasRef.current = createFloodMask(ctx, point.x, point.y, outlineCtx || undefined);
+          } else {
+            maskCanvasRef.current = null;
+          }
+        }
+      }
+
       // Draw a dot for immediate feedback
       if (tool === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
@@ -173,19 +195,25 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
       } else {
-        // Handle Brush Styles
-        ctx.globalCompositeOperation = 'source-over';
+        // Draw dot on temp canvas
+        const tempCtx = tempCanvasRef.current?.getContext('2d');
+        if (tempCtx) {
+          const brushConfig = BRUSHES[currentBrush];
+          tempCtx.globalCompositeOperation = 'source-over';
+          tempCtx.fillStyle = color;
+          tempCtx.globalAlpha = brushConfig.opacity;
+          tempCtx.beginPath();
+          tempCtx.arc(point.x, point.y, brushConfig.lineWidth / 2, 0, Math.PI * 2);
+          tempCtx.fill();
+          tempCtx.globalAlpha = 1.0;
 
-        const brushConfig = BRUSHES[currentBrush];
-        ctx.fillStyle = color;
-        ctx.globalAlpha = brushConfig.opacity;
-
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, brushConfig.lineWidth / 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Reset alpha for safety, though we set it every time
-        ctx.globalAlpha = 1.0;
+          // Apply mask immediately for the dot
+          if (maskCanvasRef.current) {
+            tempCtx.globalCompositeOperation = 'destination-in';
+            tempCtx.drawImage(maskCanvasRef.current, 0, 0);
+            tempCtx.globalCompositeOperation = 'source-over';
+          }
+        }
       }
 
       // Play brush sound (throttled in a real app, but here just on start)
@@ -207,20 +235,53 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
       drawLine(ctx, lastPoint.current, currentPoint, '#000000', 40);
       ctx.globalCompositeOperation = 'source-over';
     } else {
-      ctx.globalCompositeOperation = 'source-over';
-      const brushConfig = BRUSHES[currentBrush];
+      // Draw on temp canvas
+      const tempCanvas = tempCanvasRef.current;
+      if (tempCanvas) {
+        const tempCtx = tempCanvas.getContext('2d');
+        if (tempCtx) {
+          const brushConfig = BRUSHES[currentBrush];
 
-      ctx.globalAlpha = brushConfig.opacity;
-      drawLine(ctx, lastPoint.current, currentPoint, color, brushConfig.lineWidth);
-      ctx.globalAlpha = 1.0;
+          tempCtx.globalCompositeOperation = 'source-over';
+          tempCtx.globalAlpha = brushConfig.opacity;
+          drawLine(tempCtx, lastPoint.current, currentPoint, color, brushConfig.lineWidth);
+          tempCtx.globalAlpha = 1.0;
+
+          // Apply mask
+          if (maskCanvasRef.current) {
+            tempCtx.globalCompositeOperation = 'destination-in';
+            tempCtx.drawImage(maskCanvasRef.current, 0, 0);
+            tempCtx.globalCompositeOperation = 'source-over';
+          }
+        }
+      }
     }
 
     lastPoint.current = currentPoint;
   };
 
   const stopDrawing = () => {
+    if (!isDrawing) return;
+
     setIsDrawing(false);
     lastPoint.current = null;
+
+    // Merge temp canvas to paint canvas
+    if (tool !== 'eraser' && tempCanvasRef.current && paintCanvasRef.current) {
+      const ctx = paintCanvasRef.current.getContext('2d');
+      const tempCtx = tempCanvasRef.current.getContext('2d');
+
+      if (ctx && tempCtx) {
+        // Draw temp canvas content onto paint canvas
+        ctx.drawImage(tempCanvasRef.current, 0, 0);
+
+        // Clear temp canvas
+        tempCtx.clearRect(0, 0, tempCanvasRef.current.width, tempCanvasRef.current.height);
+      }
+    }
+
+    // Clear mask
+    maskCanvasRef.current = null;
   };
 
   return (
@@ -229,6 +290,12 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
       <canvas
         ref={paintCanvasRef}
         className="absolute inset-0 z-10"
+      />
+
+      {/* Temp Layer (Middle - for current stroke) */}
+      <canvas
+        ref={tempCanvasRef}
+        className="absolute inset-0 z-10 pointer-events-none"
       />
 
       {/* Outline Layer (Top) - Pointer events pass through to Paint Layer?
