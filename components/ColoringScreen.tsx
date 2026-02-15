@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
 import { SHAPES } from '@/lib/shapes';
 import Palette from '@/components/Palette';
 import { Tools, Actions, ToolType } from '@/components/Toolbar';
@@ -17,6 +18,7 @@ interface ColoringScreenProps {
 
 export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenProps) {
   const router = useRouter();
+  const setCategory = useAppStore((state) => state.setCategory);
   const canvasRef = useRef<CanvasBoardHandle>(null);
 
   const [selectedColor, setSelectedColor] = useState('#FFB7B2');
@@ -31,7 +33,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
     return (
       <div className="flex flex-col items-center justify-center h-screen gap-4">
         <h1 className="text-3xl font-black font-fredoka text-gray-400">Shape not found</h1>
-        <Button onClick={() => router.back()}>
+        <Button onClick={() => router.push('/')}>
           Go Back
         </Button>
       </div>
@@ -45,7 +47,10 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
         <Button
           variant="icon"
           size="icon"
-          onClick={() => router.back()}
+          onClick={() => {
+            setCategory(shape.categoryId);
+            router.push('/');
+          }}
           title="Go Back"
         >
           <ArrowLeft size={32} strokeWidth={3} className="text-gray-600" />
