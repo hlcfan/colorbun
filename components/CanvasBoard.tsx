@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { drawLine, floodFill, createFloodMask, Point } from '@/lib/canvas';
 import { ToolType } from './Toolbar';
 import { audio } from '@/lib/audio';
@@ -26,7 +26,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
   const tempCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const isDrawing = useRef(false);
   const lastPoint = useRef<Point | null>(null);
 
   // Expose export function via ref
@@ -41,7 +41,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
 
   // History management
   const historyRef = useRef<ImageData[]>([]);
-  const MAX_HISTORY = 20;
+  const MAX_HISTORY = 8;
 
   const saveToHistory = () => {
     if (!paintCanvasRef.current) return;
@@ -160,7 +160,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
         audio.play('fill');
       }
     } else {
-      setIsDrawing(true);
+      isDrawing.current = true;
       // Save state before starting new stroke
       saveToHistory();
 
@@ -223,7 +223,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
-    if (!isDrawing || !paintCanvasRef.current || !lastPoint.current) return;
+    if (!isDrawing.current || !paintCanvasRef.current || !lastPoint.current) return;
 
     const ctx = paintCanvasRef.current.getContext('2d');
     if (!ctx) return;
@@ -261,9 +261,9 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
   };
 
   const stopDrawing = () => {
-    if (!isDrawing) return;
+    if (!isDrawing.current) return;
 
-    setIsDrawing(false);
+    isDrawing.current = false;
     lastPoint.current = null;
 
     // Merge temp canvas to paint canvas

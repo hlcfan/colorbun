@@ -11,6 +11,15 @@ const fredoka = Fredoka({
 export const metadata: Metadata = {
   title: "ColorBun",
   description: "A magical coloring game for toddlers.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ColorBun",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
@@ -18,6 +27,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
   themeColor: "#fdfbf7",
 };
 
