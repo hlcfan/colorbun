@@ -53,9 +53,14 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
   const activeImageSrc = currentTool === 'fill' ? FILL_TOOL.image : (BRUSH_IMAGES[currentBrush] || '');
   const activeLabel = currentTool === 'fill' ? FILL_TOOL.label : activeBrushDef.label;
   const activeColor = currentTool === 'fill' ? FILL_TOOL.color : 'text-blue-500';
-  
+
   // Rotate the active tool icon slightly for cuteness
-  const activeRotation = currentTool === 'fill' ? 'rotate-12' : '-rotate-12';
+  // If showing Fill, rotate right (12deg). Otherwise (brush), rotate left (-12deg).
+  // We determine this by checking if the currently displayed image is the Fill tool.
+  // const activeRotation = currentTool === 'fill' ? 'rotate-12' : '-rotate-12';
+  
+  // Actually, let's keep it consistent. All tools tilt left.
+  const activeRotation = '-rotate-12';
 
   const handleGroupClick = () => {
     if (isGroupActive) {
@@ -95,16 +100,18 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
           className="p-2"
         >
            {/* Use the image component directly */}
-           <img 
-             src={activeImageSrc} 
-             alt={activeLabel}
-             className={`w-full h-full object-contain drop-shadow-sm transition-transform duration-300 mix-blend-multiply ${isGroupActive ? activeRotation : ''}`}
-             onError={(e) => {
-               // Fallback if image fails to load (e.g. not yet added)
-               e.currentTarget.style.display = 'none';
-               e.currentTarget.parentElement?.classList.add('fallback-icon');
-             }}
-           />
+           <div className="w-full h-full rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden">
+              <img
+                src={activeImageSrc}
+                alt={activeLabel}
+                className={`w-full h-full object-contain drop-shadow-sm transition-transform duration-300 ${activeRotation}`}
+                onError={(e) => {
+                  // Fallback if image fails to load (e.g. not yet added)
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement?.classList.add('fallback-icon');
+                }}
+              />
+            </div>
            {/* Fallback Icon (hidden by default unless img fails) */}
            <div className="hidden fallback-icon:block w-full h-full flex items-center justify-center text-gray-400 text-xs text-center leading-tight">
              {activeLabel}
@@ -136,7 +143,7 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
                   <img
                     src={imageSrc}
                     alt={brush.label}
-                    className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply -rotate-12"
+                    className="w-full h-full object-contain drop-shadow-sm -rotate-12"
                   />
                 </button>
               );
@@ -159,7 +166,7 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
               <img
                 src={FILL_TOOL.image}
                 alt={FILL_TOOL.label}
-                className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply rotate-12"
+                className="w-full h-full object-contain drop-shadow-sm -rotate-12"
               />
             </button>
           </div>
@@ -177,11 +184,13 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
         title={ERASER_TOOL.label}
         className="p-2"
       >
-        <img 
-          src={ERASER_TOOL.image} 
-          alt={ERASER_TOOL.label}
-          className={`w-full h-full object-contain drop-shadow-sm mix-blend-multiply transition-transform duration-300 ${currentTool === 'eraser' ? '-rotate-12' : ''}`}
-        />
+        <div className="w-full h-full rounded-2xl bg-gray-100 flex items-center justify-center overflow-hidden">
+          <img
+            src={ERASER_TOOL.image}
+            alt={ERASER_TOOL.label}
+            className="w-full h-full object-contain drop-shadow-sm transition-transform duration-300 -rotate-12"
+          />
+        </div>
       </Button>
     </div>
   );

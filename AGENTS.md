@@ -294,6 +294,8 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - Home screen, Category Tabs, Shape Grid.
   - **Toolbar**: Merged Fill tool into Brush group.
   - **Right Panel**: Redesigned as a vertical column of large floating icons (`3xl`, `w-32 h-32`).
+  - **Custom Tool Icons**: Replaced generic Lucide icons with custom 3D-style PNG assets (Marker, Pencil, Highlighter, Eraser, Fill Bucket).
+    - **Visual Polish**: Icons have transparent backgrounds, sit on a `bg-gray-100` rounded container, and feature a "cute" tilt animation (-12°/+12°) when active or hovered.
   - **Actions**: Undo and Download grouped in one row, larger buttons (`w-16 h-16`).
   - **Palette**: Popover interaction for color selection, large icon.
   - **Layout**: Optimized Left Canvas / Right Panel layout.
