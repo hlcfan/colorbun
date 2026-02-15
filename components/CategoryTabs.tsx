@@ -3,14 +3,33 @@
 import { CATEGORIES, CategoryId } from "@/lib/shapes";
 import { useAppStore } from "@/lib/store";
 import { audio } from "@/lib/audio";
-import { Cat, Car, Apple, Fish, Rocket, Skull } from "lucide-react"; // Skull as Dino placeholder
+import { Cat, Car, Apple, Fish, Rocket } from "lucide-react";
+
+// Custom Dino Icon (since Lucide doesn't have a built-in one)
+const DinoIcon = ({ size, className, strokeWidth }: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth || 2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M10 3a2 2 0 1 0 2 2h4a1 1 0 0 1 0 2H6.5a1.5 1.5 0 0 0 0 3h11a2.5 2.5 0 0 1 0 5H16v4h-2v-4h-4v4H8v-4H6.5a4.5 4.5 0 0 1-4.5-4.5c0-1.88 1.1-3.48 2.68-4.14A3.003 3.003 0 0 1 8 5c0-.66.08-1.3.23-1.91A2 2 0 0 1 10 3Z" />
+    <path d="M12 7h.01" />
+  </svg>
+);
 
 const ICON_MAP: Record<string, any> = {
   paw: Cat,
   car: Car,
   apple: Apple,
   waves: Fish,
-  dino: Skull,
+  dino: DinoIcon,
   rocket: Rocket,
 };
 

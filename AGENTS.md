@@ -313,6 +313,8 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - 7 Custom SVGs created across 6 categories.
   - All SVGs optimized with `fill="none"` for the coloring engine.
 - **State**: Zustand store connected for navigation.
+- **Navigation**:
+  - Fixed 'Back' button behavior to ensure correct category selection and home redirection when accessing deep links.
 - **Visual Redesign**:
   - Implemented "Chunky & Tactile" design system.
   - Added `Fredoka` font.
