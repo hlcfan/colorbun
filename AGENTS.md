@@ -327,6 +327,11 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - Implemented `AudioManager` with `Howler.js`.
   - Created sound asset directory structure.
   - **Generated Sound Assets**: Created `scripts/generate_sounds.sh` to synthesize custom sound effects (Tap, Brush, Pop, Success) using `ffmpeg`. All assets are generated and integrated.
+- **Mobile Optimization**:
+  - **PWA Support**: Added `manifest.json`, viewport configurations, and icons for standalone installation (Add to Home Screen).
+  - **Performance**: Optimized CanvasBoard by reducing history stack size (20 -> 8) to prevent OOM on older devices.
+  - **Input Latency**: Converted drawing state to `useRef` to eliminate input lag and missing strokes.
+  - **Rendering**: Fixed disappearing brush strokes by ensuring correct masking composition.
 
 ### 🚧 Pending / In Progress
 - **Mascot**: Bunny mascot component not yet built.
