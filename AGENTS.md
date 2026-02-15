@@ -332,6 +332,7 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
   - **Performance**: Optimized CanvasBoard by reducing history stack size (20 -> 8) to prevent OOM on older devices.
   - **Input Latency**: Converted drawing state to `useRef` to eliminate input lag and missing strokes.
   - **Rendering**: Fixed disappearing brush strokes by ensuring correct masking composition.
+  - **Layout**: Resolved iPad viewport cut-off issues by implementing `h-dvh` and Safe Area Insets (`env(safe-area-inset-*)`).
 
 ### 🚧 Pending / In Progress
 - **Mascot**: Bunny mascot component not yet built.
