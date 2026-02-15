@@ -3,7 +3,7 @@ import ShapeGrid from "@/components/ShapeGrid";
 
 export default function Home() {
   return (
-    <main className="flex flex-col h-screen w-full">
+    <main className="flex flex-col h-full w-full">
       {/* Header / Nav */}
       <div className="flex-none z-10">
         <div className="pt-6 px-6 pb-2 flex items-center justify-center max-w-5xl mx-auto w-full">

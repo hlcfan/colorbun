@@ -16,6 +16,12 @@
   /* Cartoon Palette */
   --btn-border: #2d3748; /* Dark border for everything */
   --shadow-color: rgba(0, 0, 0, 0.15);
+
+  /* Safe Area Variables */
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
 }
 
 body {
@@ -37,6 +43,13 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* Safe Area Utilities */
+.pt-safe { padding-top: var(--sat); }
+.pb-safe { padding-bottom: var(--sab); }
+.pl-safe { padding-left: var(--sal); }
+.pr-safe { padding-right: var(--sar); }
+.h-safe-screen { height: 100dvh; } /* Dynamic Viewport Height */
 
 /* Soft shadows */
 .shadow-soft {

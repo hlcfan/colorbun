@@ -31,7 +31,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
 
   if (!shape) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
+      <div className="flex flex-col items-center justify-center h-full gap-4">
         <h1 className="text-3xl font-black font-fredoka text-gray-400">Shape not found</h1>
         <Button onClick={() => router.push('/')}>
           Go Back
@@ -41,7 +41,7 @@ export default function ColoringScreen({ categoryId, shapeId }: ColoringScreenPr
   }
 
   return (
-    <main className="flex flex-col h-screen w-full overflow-hidden">
+    <main className="flex flex-col h-full w-full overflow-hidden">
       {/* Top Bar */}
       <div className="flex-none h-20 px-6 flex items-center justify-between">
         <Button

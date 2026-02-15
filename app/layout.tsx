@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${fredoka.variable} font-sans antialiased h-screen w-screen overflow-hidden`}>
+      <body className={`${fredoka.variable} font-sans antialiased h-safe-screen w-screen overflow-hidden pt-safe pb-safe pl-safe pr-safe`}>
         {children}
       </body>
     </html>
