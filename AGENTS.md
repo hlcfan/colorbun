@@ -318,7 +318,7 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
 - **Audio**:
   - Implemented `AudioManager` with `Howler.js`.
   - Created sound asset directory structure.
+  - **Generated Sound Assets**: Created `scripts/generate_sounds.sh` to synthesize custom sound effects (Tap, Brush, Pop, Success) using `ffmpeg`. All assets are generated and integrated.
 
 ### 🚧 Pending / In Progress
-- **Audio Assets**: Sound files need to be added to `public/assets/sounds`.
 - **Mascot**: Bunny mascot component not yet built.

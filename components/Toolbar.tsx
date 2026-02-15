@@ -42,8 +42,14 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
     };
   }, []);
 
-  const handleBrushClick = () => {
-    if (currentTool === 'brush') {
+  const activeBrushDef = BRUSHES[currentBrush];
+  const isGroupActive = currentTool === 'brush' || currentTool === 'fill';
+  const activeIcon = currentTool === 'fill' ? FILL_TOOL.icon : activeBrushDef.icon;
+  const activeLabel = currentTool === 'fill' ? FILL_TOOL.label : activeBrushDef.label;
+  const activeColor = currentTool === 'fill' ? FILL_TOOL.color : 'text-blue-500';
+
+  const handleGroupClick = () => {
+    if (isGroupActive) {
       setIsBrushOpen(!isBrushOpen);
     } else {
       onSelectTool('brush');
@@ -65,24 +71,26 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
     setIsBrushOpen(false);
   };
 
-  const activeBrushDef = BRUSHES[currentBrush];
-
   return (
     <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] justify-center items-center w-full">
-      
-      {/* Brush Tool with Popover */}
+
+      {/* Brush/Fill Group with Popover */}
       <div className="relative" ref={brushContainerRef}>
         <Button
           variant="icon"
           size="icon"
-          active={currentTool === 'brush'}
-          onClick={handleBrushClick}
-          color="text-blue-500"
-          title={activeBrushDef.label}
+          active={isGroupActive}
+          onClick={handleGroupClick}
+          color={activeColor}
+          title={activeLabel}
         >
-          <activeBrushDef.icon size={28} strokeWidth={2.5} />
+          {currentTool === 'fill' ? (
+            <FILL_TOOL.icon size={28} strokeWidth={2.5} />
+          ) : (
+            <activeBrushDef.icon size={28} strokeWidth={2.5} />
+          )}
         </Button>
-        
+
         {isBrushOpen && (
           <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-2xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] flex flex-col gap-3 w-48 z-50 animate-in fade-in zoom-in-95 duration-200 items-start pointer-events-auto">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2 font-fredoka">Brushes</h3>
@@ -96,33 +104,46 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
                 }}
                 className={`
                   flex items-center gap-3 w-full p-2 rounded-xl transition-all font-bold
-                  ${currentBrush === brush.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600'}
+                  ${currentTool === 'brush' && currentBrush === brush.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600'}
                 `}
               >
                 <div className={`
                   w-10 h-10 rounded-lg flex items-center justify-center border-2
-                  ${currentBrush === brush.id ? 'bg-blue-100 border-blue-200' : 'bg-gray-100 border-gray-200'}
+                  ${currentTool === 'brush' && currentBrush === brush.id ? 'bg-blue-100 border-blue-200' : 'bg-gray-100 border-gray-200'}
                 `}>
                   <brush.icon size={20} strokeWidth={2.5} />
                 </div>
                 <span className="font-medium text-sm">{brush.label}</span>
               </button>
             ))}
+
+            <div className="w-full h-px bg-gray-100 my-1"></div>
+
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleToolSelect('fill');
+              }}
+              className={`
+                flex items-center gap-3 w-full p-2 rounded-xl transition-all font-bold
+                ${currentTool === 'fill' ? 'bg-orange-50 text-orange-600' : 'hover:bg-gray-50 text-gray-600'}
+              `}
+            >
+              <div className={`
+                w-10 h-10 rounded-lg flex items-center justify-center border-2
+                ${currentTool === 'fill' ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'}
+              `}>
+                <FILL_TOOL.icon size={20} strokeWidth={2.5} />
+              </div>
+              <span className="font-medium text-sm">{FILL_TOOL.label}</span>
+            </button>
           </div>
         )}
       </div>
-      
-      <Button
-        variant="icon"
-        size="icon"
-        active={currentTool === 'fill'}
-        onClick={() => handleToolSelect('fill')}
-        color={FILL_TOOL.color}
-        title={FILL_TOOL.label}
-      >
-        <FILL_TOOL.icon size={28} strokeWidth={2.5} />
-      </Button>
-      
+
+      {/* Fill tool removed from here */}
+
       <Button
         variant="icon"
         size="icon"
@@ -169,7 +190,7 @@ export function Actions({ onUndo, onRedo, onExport, canUndo = false, canRedo = f
           <Redo2 size={24} strokeWidth={2.5} />
         </Button>
       </div>
-      
+
       <Button
         variant="icon"
         size="icon"
