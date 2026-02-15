@@ -69,15 +69,15 @@ export default function Palette({ selectedColor, onSelectColor }: PaletteProps) 
       </Button>
 
       {isOpen && (
-        <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] grid grid-cols-3 gap-3 w-64 z-50 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute right-full top-0 mr-6 p-6 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] grid grid-cols-3 gap-4 w-max z-50 animate-in fade-in zoom-in-95 duration-200">
            {COLORS.map((color) => (
              <button
                key={color}
                onClick={() => handleSelect(color)}
                className={`
-                 w-12 h-12 rounded-full border-[3px] transition-all duration-150 shadow-[0_3px_0_rgba(0,0,0,0.2)]
-                 active:translate-y-[3px] active:shadow-none
-                 ${selectedColor === color ? 'border-gray-800 scale-110 ring-2 ring-gray-200' : 'border-white hover:scale-110'}
+                 w-20 h-20 rounded-full border-[4px] transition-all duration-150 shadow-[0_4px_0_rgba(0,0,0,0.2)]
+                 active:translate-y-[4px] active:shadow-none
+                 ${selectedColor === color ? 'border-gray-800 scale-110 ring-4 ring-gray-200' : 'border-white hover:scale-110'}
                `}
                style={{ backgroundColor: color }}
                aria-label={`Select color ${color}`}
