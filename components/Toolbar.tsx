@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Paintbrush, PaintBucket, Eraser, Undo2, Download } from "lucide-react";
+import { PaintBucket, Eraser, Undo2, Download } from "lucide-react";
 import { audio } from "@/lib/audio";
 import { BRUSHES, BrushType } from '@/lib/brushes';
 import { Button } from './Button';
@@ -21,8 +21,14 @@ interface ActionsProps {
   canUndo?: boolean;
 }
 
-const FILL_TOOL = { id: 'fill', icon: PaintBucket, label: 'Fill', color: 'text-orange-500' };
-const ERASER_TOOL = { id: 'eraser', icon: Eraser, label: 'Eraser', color: 'text-pink-500' };
+const FILL_TOOL = { id: 'fill', icon: PaintBucket, label: 'Fill', color: 'text-orange-500', image: '/assets/ui/fill_bucket.png' };
+const ERASER_TOOL = { id: 'eraser', icon: Eraser, label: 'Eraser', color: 'text-pink-500', image: '/assets/ui/eraser.png' };
+
+const BRUSH_IMAGES: Record<string, string> = {
+  marker: '/assets/ui/marker.png',
+  pencil: '/assets/ui/pencil.png',
+  highlighter: '/assets/ui/highlighter.png',
+};
 
 export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }: ToolsProps) {
   const [isBrushOpen, setIsBrushOpen] = useState(false);
@@ -42,9 +48,14 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
 
   const activeBrushDef = BRUSHES[currentBrush];
   const isGroupActive = currentTool === 'brush' || currentTool === 'fill';
-  const activeIcon = currentTool === 'fill' ? FILL_TOOL.icon : activeBrushDef.icon;
+
+  // Use image for main button if active
+  const activeImageSrc = currentTool === 'fill' ? FILL_TOOL.image : (BRUSH_IMAGES[currentBrush] || '');
   const activeLabel = currentTool === 'fill' ? FILL_TOOL.label : activeBrushDef.label;
   const activeColor = currentTool === 'fill' ? FILL_TOOL.color : 'text-blue-500';
+  
+  // Rotate the active tool icon slightly for cuteness
+  const activeRotation = currentTool === 'fill' ? 'rotate-12' : '-rotate-12';
 
   const handleGroupClick = () => {
     if (isGroupActive) {
@@ -81,41 +92,55 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
           onClick={handleGroupClick}
           color={activeColor}
           title={activeLabel}
+          className="p-2"
         >
-          {currentTool === 'fill' ? (
-            <FILL_TOOL.icon size={64} strokeWidth={2.5} />
-          ) : (
-            <activeBrushDef.icon size={64} strokeWidth={2.5} />
-          )}
+           {/* Use the image component directly */}
+           <img 
+             src={activeImageSrc} 
+             alt={activeLabel}
+             className={`w-full h-full object-contain drop-shadow-sm transition-transform duration-300 mix-blend-multiply ${isGroupActive ? activeRotation : ''}`}
+             onError={(e) => {
+               // Fallback if image fails to load (e.g. not yet added)
+               e.currentTarget.style.display = 'none';
+               e.currentTarget.parentElement?.classList.add('fallback-icon');
+             }}
+           />
+           {/* Fallback Icon (hidden by default unless img fails) */}
+           <div className="hidden fallback-icon:block w-full h-full flex items-center justify-center text-gray-400 text-xs text-center leading-tight">
+             {activeLabel}
+           </div>
         </Button>
 
         {isBrushOpen && (
-          <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-2xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] flex flex-col gap-3 w-48 z-50 animate-in fade-in zoom-in-95 duration-200 items-start pointer-events-auto">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2 font-fredoka">Brushes</h3>
-            {Object.values(BRUSHES).map((brush) => (
-              <button
-                key={brush.id}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleBrushSelect(brush.id);
-                }}
-                className={`
-                  flex items-center gap-3 w-full p-2 rounded-xl transition-all font-bold
-                  ${currentTool === 'brush' && currentBrush === brush.id ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600'}
-                `}
-              >
-                <div className={`
-                  w-10 h-10 rounded-lg flex items-center justify-center border-2
-                  ${currentTool === 'brush' && currentBrush === brush.id ? 'bg-blue-100 border-blue-200' : 'bg-gray-100 border-gray-200'}
-                `}>
-                  <brush.icon size={20} strokeWidth={2.5} />
-                </div>
-                <span className="font-medium text-sm">{brush.label}</span>
-              </button>
-            ))}
+          <div className="absolute right-full top-0 mr-4 p-4 bg-white rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] grid grid-cols-2 gap-4 w-64 z-50 animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
+            {Object.values(BRUSHES).map((brush) => {
+              const imageSrc = BRUSH_IMAGES[brush.id];
+              const isSelected = currentTool === 'brush' && currentBrush === brush.id;
 
-            <div className="w-full h-px bg-gray-100 my-1"></div>
+              return (
+                <button
+                  key={brush.id}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBrushSelect(brush.id);
+                  }}
+                  className={`
+                    flex items-center justify-center aspect-square rounded-2xl transition-all border-[3px] overflow-hidden p-2
+                    ${isSelected
+                      ? 'bg-blue-50 border-blue-400 shadow-[0_4px_0_#60A5FA] translate-y-0'
+                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100 shadow-[0_4px_0_#E5E7EB] hover:translate-y-[-2px]'}
+                  `}
+                  title={brush.label}
+                >
+                  <img
+                    src={imageSrc}
+                    alt={brush.label}
+                    className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply -rotate-12"
+                  />
+                </button>
+              );
+            })}
 
             <button
               onMouseDown={(e) => {
@@ -124,17 +149,18 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
                 handleToolSelect('fill');
               }}
               className={`
-                flex items-center gap-3 w-full p-2 rounded-xl transition-all font-bold
-                ${currentTool === 'fill' ? 'bg-orange-50 text-orange-600' : 'hover:bg-gray-50 text-gray-600'}
+                flex items-center justify-center aspect-square rounded-2xl transition-all border-[3px] overflow-hidden p-2
+                ${currentTool === 'fill'
+                  ? 'bg-orange-50 border-orange-400 shadow-[0_4px_0_#FB923C] translate-y-0'
+                  : 'bg-gray-50 border-gray-200 hover:bg-gray-100 shadow-[0_4px_0_#E5E7EB] hover:translate-y-[-2px]'}
               `}
+              title={FILL_TOOL.label}
             >
-              <div className={`
-                w-10 h-10 rounded-lg flex items-center justify-center border-2
-                ${currentTool === 'fill' ? 'bg-orange-100 border-orange-200' : 'bg-gray-100 border-gray-200'}
-              `}>
-                <FILL_TOOL.icon size={20} strokeWidth={2.5} />
-              </div>
-              <span className="font-medium text-sm">{FILL_TOOL.label}</span>
+              <img
+                src={FILL_TOOL.image}
+                alt={FILL_TOOL.label}
+                className="w-full h-full object-contain drop-shadow-sm mix-blend-multiply rotate-12"
+              />
             </button>
           </div>
         )}
@@ -149,8 +175,13 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
         onClick={() => handleToolSelect('eraser')}
         color={ERASER_TOOL.color}
         title={ERASER_TOOL.label}
+        className="p-2"
       >
-        <ERASER_TOOL.icon size={64} strokeWidth={2.5} />
+        <img 
+          src={ERASER_TOOL.image} 
+          alt={ERASER_TOOL.label}
+          className={`w-full h-full object-contain drop-shadow-sm mix-blend-multiply transition-transform duration-300 ${currentTool === 'eraser' ? '-rotate-12' : ''}`}
+        />
       </Button>
     </div>
   );
