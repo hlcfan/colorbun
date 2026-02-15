@@ -55,7 +55,7 @@ export default function Palette({ selectedColor, onSelectColor }: PaletteProps) 
     <div className="relative w-full flex justify-center" ref={containerRef}>
       <Button
         variant="icon"
-        size="icon"
+        size="3xl"
         onClick={handleToggle}
         className="overflow-hidden"
         style={{ backgroundColor: selectedColor }}
@@ -63,7 +63,7 @@ export default function Palette({ selectedColor, onSelectColor }: PaletteProps) 
       >
          <PaletteIcon 
           className={`drop-shadow-md ${selectedColor === '#ffffff' ? 'text-gray-400' : 'text-white'}`} 
-          size={32}
+          size={64}
           strokeWidth={2.5}
         />
       </Button>

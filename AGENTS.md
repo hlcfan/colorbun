@@ -292,14 +292,17 @@ If unsure about a decision → choose what makes it **simpler, softer, happier**
 - **Project Structure**: Next.js 16, Tailwind, TypeScript initialized.
 - **Core UI**:
   - Home screen, Category Tabs, Shape Grid.
-  - **Toolbar**: Split into Tools and Actions, standalone buttons for Fill/Eraser.
-  - **Palette**: Popover interaction for color selection.
+  - **Toolbar**: Merged Fill tool into Brush group.
+  - **Right Panel**: Redesigned as a vertical column of large floating icons (`3xl`, `w-32 h-32`).
+  - **Actions**: Undo and Download grouped in one row, larger buttons (`w-16 h-16`).
+  - **Palette**: Popover interaction for color selection, large icon.
   - **Layout**: Optimized Left Canvas / Right Panel layout.
 - **Coloring Engine**:
   - **Dual-Canvas System** (Paint Layer bottom, SVG Outline top).
+  - **Transparent Background**: Canvas background is transparent for brush/eraser.
   - **Flood Fill** algorithm with boundary detection.
   - **Brush System**: Multiple brush types (Marker, Pencil, Highlighter) with custom opacity/width.
-  - **Undo/Redo**: Full history stack implementation.
+  - **Undo**: History stack implementation (Redo removed for simplicity).
 - **Touch Optimization**:
   - Global text selection disabled (`user-select: none`).
   - Event propagation fixes for popovers.

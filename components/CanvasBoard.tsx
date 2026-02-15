@@ -16,12 +16,11 @@ interface CanvasBoardProps {
   color: string;
   outlineSrc: string; // URL to the SVG outline
   currentBrush: BrushType;
-  onHistoryChange?: (canUndo: boolean, canRedo: boolean) => void;
+  onHistoryChange?: (canUndo: boolean) => void;
   undoTrigger?: number; // Increment this to trigger undo
-  redoTrigger?: number; // Increment this to trigger redo
 }
 
-const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger, redoTrigger }, ref) => {
+const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, color, outlineSrc, currentBrush, onHistoryChange, undoTrigger }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const paintCanvasRef = useRef<HTMLCanvasElement>(null);
   const outlineCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,7 +39,6 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
 
   // History management
   const historyRef = useRef<ImageData[]>([]);
-  const redoStackRef = useRef<ImageData[]>([]);
   const MAX_HISTORY = 20;
 
   const saveToHistory = () => {
@@ -57,11 +55,8 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
       historyRef.current.shift();
     }
 
-    // Clear redo stack when new action is performed
-    redoStackRef.current = [];
-
     // Notify parent about history state
-    onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
+    onHistoryChange?.(historyRef.current.length > 0);
   };
 
   // Handle undo trigger
@@ -74,10 +69,6 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
       const ctx = paintCanvas.getContext('2d');
       if (!ctx) return;
 
-      // Save current state to redo stack before undoing
-      const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
-      redoStackRef.current.push(currentImageData);
-
       const previousState = historyRef.current.pop();
       if (previousState) {
         ctx.putImageData(previousState, 0, 0);
@@ -86,31 +77,9 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
         ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
       }
 
-      onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
+      onHistoryChange?.(historyRef.current.length > 0);
     }
   }, [undoTrigger]);
-
-  // Handle redo trigger
-  useEffect(() => {
-    if (redoTrigger && redoTrigger > 0) {
-      if (redoStackRef.current.length === 0) return;
-
-      const paintCanvas = paintCanvasRef.current;
-      if (!paintCanvas) return;
-      const ctx = paintCanvas.getContext('2d');
-      if (!ctx) return;
-
-      const currentImageData = ctx.getImageData(0, 0, paintCanvas.width, paintCanvas.height);
-      historyRef.current.push(currentImageData);
-
-      const nextState = redoStackRef.current.pop();
-      if (nextState) {
-        ctx.putImageData(nextState, 0, 0);
-      }
-
-      onHistoryChange?.(historyRef.current.length > 0, redoStackRef.current.length > 0);
-    }
-  }, [redoTrigger]);
 
   // Initialize canvas size and load outline
   useEffect(() => {
@@ -255,7 +224,7 @@ const CanvasBoard = forwardRef<CanvasBoardHandle, CanvasBoardProps>(({ tool, col
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full bg-white rounded-3xl shadow-inner overflow-hidden touch-none">
+    <div ref={containerRef} className="relative w-full h-full rounded-3xl shadow-inner overflow-hidden touch-none">
       {/* Paint Layer (Bottom) */}
       <canvas
         ref={paintCanvasRef}

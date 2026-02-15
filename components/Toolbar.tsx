@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Paintbrush, PaintBucket, Eraser, Undo2, Redo2, Download } from "lucide-react";
+import { Paintbrush, PaintBucket, Eraser, Undo2, Download } from "lucide-react";
 import { audio } from "@/lib/audio";
 import { BRUSHES, BrushType } from '@/lib/brushes';
 import { Button } from './Button';
@@ -17,10 +17,8 @@ interface ToolsProps {
 
 interface ActionsProps {
   onUndo: () => void;
-  onRedo: () => void;
   onExport: () => void;
   canUndo?: boolean;
-  canRedo?: boolean;
 }
 
 const FILL_TOOL = { id: 'fill', icon: PaintBucket, label: 'Fill', color: 'text-orange-500' };
@@ -72,22 +70,22 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] justify-center items-center w-full">
+    <div className="flex flex-col gap-4 w-full items-center">
 
       {/* Brush/Fill Group with Popover */}
       <div className="relative" ref={brushContainerRef}>
         <Button
           variant="icon"
-          size="icon"
+          size="3xl"
           active={isGroupActive}
           onClick={handleGroupClick}
           color={activeColor}
           title={activeLabel}
         >
           {currentTool === 'fill' ? (
-            <FILL_TOOL.icon size={28} strokeWidth={2.5} />
+            <FILL_TOOL.icon size={64} strokeWidth={2.5} />
           ) : (
-            <activeBrushDef.icon size={28} strokeWidth={2.5} />
+            <activeBrushDef.icon size={64} strokeWidth={2.5} />
           )}
         </Button>
 
@@ -146,26 +144,26 @@ export function Tools({ currentTool, currentBrush, onSelectTool, onSelectBrush }
 
       <Button
         variant="icon"
-        size="icon"
+        size="3xl"
         active={currentTool === 'eraser'}
         onClick={() => handleToolSelect('eraser')}
         color={ERASER_TOOL.color}
         title={ERASER_TOOL.label}
       >
-        <ERASER_TOOL.icon size={28} strokeWidth={2.5} />
+        <ERASER_TOOL.icon size={64} strokeWidth={2.5} />
       </Button>
     </div>
   );
 }
 
-export function Actions({ onUndo, onRedo, onExport, canUndo = false, canRedo = false }: ActionsProps) {
+export function Actions({ onUndo, onExport, canUndo = false }: ActionsProps) {
   const handleActionClick = (action: () => void) => {
     // audio.play('tap'); // Handled by Button
     action();
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 bg-white/80 backdrop-blur rounded-3xl border-[3px] border-[var(--btn-border)] shadow-[4px_4px_0_var(--shadow-color)] justify-center items-center w-full">
+    <div className="flex flex-col gap-4 w-full items-center">
       <div className="flex gap-2 w-full justify-center">
         <Button
           variant="icon"
@@ -174,32 +172,22 @@ export function Actions({ onUndo, onRedo, onExport, canUndo = false, canRedo = f
           disabled={!canUndo}
           color="text-gray-600"
           title="Undo"
-          className="w-12 h-12 p-0"
+          className="w-16 h-16 p-0"
         >
-          <Undo2 size={24} strokeWidth={2.5} />
+          <Undo2 size={36} strokeWidth={2.5} />
         </Button>
+
         <Button
           variant="icon"
           size="sm"
-          onClick={() => handleActionClick(onRedo)}
-          disabled={!canRedo}
-          color="text-gray-600"
-          title="Redo"
-          className="w-12 h-12 p-0"
+          onClick={() => handleActionClick(onExport)}
+          color="text-green-600"
+          title="Save"
+          className="w-16 h-16 p-0"
         >
-          <Redo2 size={24} strokeWidth={2.5} />
+          <Download size={36} strokeWidth={2.5} />
         </Button>
       </div>
-
-      <Button
-        variant="icon"
-        size="icon"
-        onClick={() => handleActionClick(onExport)}
-        color="text-green-600"
-        title="Save"
-      >
-        <Download size={28} strokeWidth={2.5} />
-      </Button>
     </div>
   );
 }
